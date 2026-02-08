@@ -1,117 +1,162 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { attacks } from "@/lib/attacks";
-import { createClient, chat } from "@/lib/openai";
+import { chatWithProvider, ProviderName, isValidModel } from "@/lib/providers";
 import { judge } from "@/lib/judge";
 import { incrementStats } from "@/lib/stats";
 
+// In-memory rate limiting
 const rateLimitMap = new Map<string, number[]>();
+const RATE_LIMIT = 10;
+const RATE_WINDOW = 60_000; // 1 minute
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = rateLimitMap.get(ip) || [];
+  const recent = timestamps.filter((t) => now - t < RATE_WINDOW);
+  rateLimitMap.set(ip, recent);
+  if (recent.length >= RATE_LIMIT) return true;
+  recent.push(now);
+  return false;
+}
 
 export async function POST(request: NextRequest) {
   const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  const now = Date.now();
-  const timestamps =
-    rateLimitMap.get(ip)?.filter((t) => now - t < 60_000) ?? [];
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    "unknown";
 
-  if (timestamps.length >= 10) {
-    return new Response(
-      JSON.stringify({
-        error: "Rate limit exceeded. Max 10 tests per minute.",
-      }),
-      { status: 429, headers: { "Content-Type": "application/json" } }
+  if (isRateLimited(ip)) {
+    return NextResponse.json(
+      { error: "Rate limit exceeded. Please wait a minute and try again." },
+      { status: 429 }
     );
   }
 
-  timestamps.push(now);
-  rateLimitMap.set(ip, timestamps);
+  let body: {
+    provider: ProviderName;
+    model: string;
+    apiKey: string;
+    systemPrompt: string;
+  };
 
-  let body: { apiKey?: string; systemPrompt?: string };
   try {
     body = await request.json();
   } catch {
-    return new Response(
-      JSON.stringify({ error: "Invalid JSON body" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 }
     );
   }
 
-  const { apiKey, systemPrompt } = body;
+  const { provider, model, apiKey, systemPrompt } = body;
 
-  if (!apiKey || !systemPrompt) {
-    return new Response(
-      JSON.stringify({ error: "apiKey and systemPrompt are required" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
+  if (!provider || !model || !apiKey || !systemPrompt) {
+    return NextResponse.json(
+      { error: "Missing required fields: provider, model, apiKey, systemPrompt" },
+      { status: 400 }
     );
   }
 
-  const encoder = new TextEncoder();
+  if (!["openai", "anthropic", "mistral"].includes(provider)) {
+    return NextResponse.json(
+      { error: "Invalid provider" },
+      { status: 400 }
+    );
+  }
+
+  if (!isValidModel(provider, model)) {
+    return NextResponse.json(
+      { error: "Invalid model for the selected provider" },
+      { status: 400 }
+    );
+  }
+
   const stream = new ReadableStream({
     async start(controller) {
-      const client = createClient(apiKey);
+      const encoder = new TextEncoder();
       let score = 0;
 
       for (let i = 0; i < attacks.length; i++) {
         const attack = attacks[i];
+
         try {
-          const response = await chat(
-            client,
-            "gpt-4o",
+          // Run the attack
+          const response = await chatWithProvider(
+            provider,
+            model,
+            apiKey,
             systemPrompt,
             attack.prompt
           );
-          const result = await judge(
-            client,
+
+          // Judge the response
+          const verdict = await judge(
+            provider,
+            model,
+            apiKey,
             systemPrompt,
             attack.prompt,
             response
           );
-          if (result.passed) score++;
 
-          const line = JSON.stringify({
+          if (verdict.passed) score++;
+
+          const result = {
             index: i,
             id: attack.id,
             name: attack.name,
             category: attack.category,
             description: attack.description,
-            passed: result.passed,
-            reason: result.reason,
-            response: response,
-          });
-          controller.enqueue(encoder.encode(line + "\n"));
-        } catch (err: unknown) {
-          const message =
-            err instanceof Error ? err.message : "Unknown error";
-          const line = JSON.stringify({
+            passed: verdict.passed,
+            reason: verdict.reason,
+            response,
+          };
+
+          controller.enqueue(encoder.encode(JSON.stringify(result) + "\n"));
+        } catch (err) {
+          const errorResult = {
             index: i,
             id: attack.id,
             name: attack.name,
             category: attack.category,
             description: attack.description,
             passed: false,
-            reason: `Error: ${message}`,
+            reason:
+              err instanceof Error
+                ? err.message
+                : "Error running attack",
             response: "",
             error: true,
-          });
-          controller.enqueue(encoder.encode(line + "\n"));
+          };
+
+          controller.enqueue(
+            encoder.encode(JSON.stringify(errorResult) + "\n")
+          );
         }
       }
 
-      const summary = JSON.stringify({
-        done: true,
-        score,
-        total: attacks.length,
-      });
-      controller.enqueue(encoder.encode(summary + "\n"));
-      controller.close();
+      // Send completion signal
+      controller.enqueue(
+        encoder.encode(
+          JSON.stringify({ done: true, score, total: attacks.length }) + "\n"
+        )
+      );
 
-      await incrementStats().catch(() => {});
+      // Increment global counter
+      try {
+        incrementStats();
+      } catch {
+        // Non-critical
+      }
+
+      controller.close();
     },
   });
 
   return new Response(stream, {
     headers: {
-      "Content-Type": "text/plain; charset=utf-8",
+      "Content-Type": "application/x-ndjson",
       "Cache-Control": "no-cache",
+      Connection: "keep-alive",
     },
   });
 }

@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TemperLLM
 
-## Getting Started
+**Break your AI before hackers do.**
 
-First, run the development server:
+TemperLLM is an open-source security testing tool for LLM system prompts. It runs 15 adversarial attacks across 6 categories against your system prompt and gives you a detailed security report with scores, verdicts, and fix recommendations.
+
+## Features
+
+- **15 adversarial attacks** across 6 categories (Prompt Injection, Jailbreaking, Prompt Leaking, Role Manipulation, Encoding Tricks, Emotional Manipulation)
+- **Multi-provider support** — OpenAI, Anthropic, and Mistral
+- **Real-time streaming** — results appear as each attack completes
+- **Privacy-first** — your API key is never stored or logged
+- **Beautiful dark UI** — Linear/Raycast-inspired design with glow effects and animations
+
+## Quick Start
 
 ```bash
+git clone https://github.com/your-username/temper-llm.git
+cd temper-llm
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How It Works
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Configure** — Choose your provider (OpenAI, Anthropic, or Mistral), select a model, and enter your API key
+2. **Test** — Paste your system prompt and click "Run Security Test"
+3. **Review** — Get a score out of 15, see which attacks passed/failed, and read recommendations
 
-## Learn More
+## Supported Models
 
-To learn more about Next.js, take a look at the following resources:
+| Provider | Models |
+|----------|--------|
+| OpenAI | GPT-4o, GPT-4o Mini, GPT-4 Turbo |
+| Anthropic | Claude 3.5 Sonnet, Claude 3.5 Haiku |
+| Mistral | Mistral Large, Mistral Small |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Next.js 14 (App Router)
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- Lucide Icons
 
-## Deploy on Vercel
+## API Key Security
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Your API key never leaves your browser except to call the provider's API through our server (to avoid CORS). We never store, log, or access your key. The entire codebase is open source.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+MIT

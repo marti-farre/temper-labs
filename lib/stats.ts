@@ -1,27 +1,41 @@
-import { promises as fs } from "fs";
-import path from "path";
+import { readFileSync, writeFileSync, existsSync } from "fs";
+import { join } from "path";
 
-const STATS_FILE = path.join(process.cwd(), ".stats.json");
-let count: number | null = null;
+const STATS_FILE = join(process.cwd(), ".stats.json");
 
-async function loadCount(): Promise<number> {
-  if (count !== null) return count;
+interface Stats {
+  count: number;
+}
+
+let cached: Stats | null = null;
+
+function load(): Stats {
+  if (cached) return cached;
   try {
-    const data = await fs.readFile(STATS_FILE, "utf-8");
-    count = JSON.parse(data).count || 0;
+    if (existsSync(STATS_FILE)) {
+      const data = JSON.parse(readFileSync(STATS_FILE, "utf-8"));
+      cached = { count: Number(data.count) || 0 };
+    } else {
+      cached = { count: 0 };
+    }
   } catch {
-    count = 0;
+    cached = { count: 0 };
   }
-  return count as number;
+  return cached;
 }
 
-export async function getStats(): Promise<number> {
-  return loadCount();
+export function getStats(): Stats {
+  return load();
 }
 
-export async function incrementStats(): Promise<number> {
-  const current = await loadCount();
-  count = current + 1;
-  fs.writeFile(STATS_FILE, JSON.stringify({ count }), "utf-8").catch(() => {});
-  return count;
+export function incrementStats(): Stats {
+  const stats = load();
+  stats.count += 1;
+  cached = stats;
+  try {
+    writeFileSync(STATS_FILE, JSON.stringify(stats), "utf-8");
+  } catch {
+    // Silently fail if filesystem is read-only (e.g., serverless)
+  }
+  return stats;
 }
