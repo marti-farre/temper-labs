@@ -1,101 +1,205 @@
-import Image from "next/image";
+"use client";
+
+import { useReducer, useEffect, useRef, useCallback } from "react";
+import { reducer, initialState, AttackResult } from "@/lib/reducer";
+import Header from "@/components/Header";
+import Hero from "@/components/Hero";
+import ApiKeyInput from "@/components/ApiKeyInput";
+import SecurityExplanation from "@/components/SecurityExplanation";
+import TestForm from "@/components/TestForm";
+import ScoreDisplay from "@/components/ScoreDisplay";
+import Results from "@/components/Results";
+import Footer from "@/components/Footer";
+
+const STORAGE_KEY = "temperllm-api-key";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const hasScrolled = useRef(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  // Load API key from localStorage on mount
+  useEffect(() => {
+    const savedKey = localStorage.getItem(STORAGE_KEY);
+    if (savedKey) {
+      dispatch({ type: "SET_API_KEY", payload: savedKey });
+      dispatch({ type: "SET_REMEMBER_KEY", payload: true });
+    }
+  }, []);
+
+  // Persist API key to localStorage
+  useEffect(() => {
+    if (state.rememberKey && state.apiKey) {
+      localStorage.setItem(STORAGE_KEY, state.apiKey);
+    } else if (!state.rememberKey) {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, [state.rememberKey, state.apiKey]);
+
+  // Auto-scroll to results when first result arrives
+  useEffect(() => {
+    if (state.results.length === 1 && !hasScrolled.current) {
+      hasScrolled.current = true;
+      resultsRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [state.results.length]);
+
+  const handleRunTest = useCallback(async () => {
+    dispatch({ type: "START_TEST" });
+    hasScrolled.current = false;
+
+    try {
+      const response = await fetch("/api/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          apiKey: state.apiKey,
+          systemPrompt: state.systemPrompt,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        const message =
+          errorData?.error ||
+          (response.status === 429
+            ? "Too many tests. Please wait 60 seconds."
+            : `Request failed (${response.status})`);
+        dispatch({ type: "TEST_ERROR", payload: message });
+        return;
+      }
+
+      if (!response.body) {
+        dispatch({
+          type: "TEST_ERROR",
+          payload: "No response body received",
+        });
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          try {
+            const data = JSON.parse(line);
+            if (data.done) {
+              dispatch({ type: "TEST_COMPLETE" });
+            } else {
+              const result: AttackResult = {
+                index: data.index,
+                id: data.id,
+                name: data.name,
+                category: data.category,
+                description: data.description,
+                passed: data.passed,
+                reason: data.reason,
+                response: data.response,
+                error: data.error,
+              };
+              dispatch({ type: "ADD_RESULT", payload: result });
+            }
+          } catch {
+            // Skip malformed lines
+          }
+        }
+      }
+
+      // Handle any remaining buffer
+      if (buffer.trim()) {
+        try {
+          const data = JSON.parse(buffer);
+          if (data.done) {
+            dispatch({ type: "TEST_COMPLETE" });
+          }
+        } catch {
+          // Ignore
+        }
+      }
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Network error. Please check your connection.";
+      dispatch({ type: "TEST_ERROR", payload: message });
+    }
+  }, [state.apiKey, state.systemPrompt]);
+
+  const score = state.results.filter((r) => r.passed).length;
+  const isDisabled = !state.apiKey.trim() || !state.systemPrompt.trim();
+  const isRunning = state.status === "running";
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-1">
+        <Hero />
+        <div className="max-w-content mx-auto px-4 space-y-8 pb-16">
+          <ApiKeyInput
+            apiKey={state.apiKey}
+            rememberKey={state.rememberKey}
+            onApiKeyChange={(key) =>
+              dispatch({ type: "SET_API_KEY", payload: key })
+            }
+            onRememberChange={(remember) =>
+              dispatch({ type: "SET_REMEMBER_KEY", payload: remember })
+            }
+            disabled={isRunning}
+          />
+          <SecurityExplanation />
+          <TestForm
+            systemPrompt={state.systemPrompt}
+            onSystemPromptChange={(prompt) =>
+              dispatch({ type: "SET_SYSTEM_PROMPT", payload: prompt })
+            }
+            onSubmit={handleRunTest}
+            disabled={isDisabled}
+            isRunning={isRunning}
+          />
+
+          {state.error && (
+            <div className="bg-surface border border-fail/30 rounded-md p-4 text-sm text-fail">
+              {state.error}
+            </div>
+          )}
+
+          <div ref={resultsRef}>
+            <ScoreDisplay
+              score={score}
+              total={15}
+              progress={state.progress}
+              status={state.status}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
+
+          <Results
+            results={state.results}
+            expandedResults={state.expandedResults}
+            onToggleResult={(i) =>
+              dispatch({ type: "TOGGLE_RESULT", payload: i })
+            }
+            onExpandAll={() => dispatch({ type: "EXPAND_ALL" })}
+            onCollapseAll={() => dispatch({ type: "COLLAPSE_ALL" })}
+            status={state.status}
+            score={score}
+            total={15}
+          />
         </div>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      <Footer />
     </div>
   );
 }
