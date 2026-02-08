@@ -3,20 +3,22 @@
 @tailwind utilities;
 
 :root {
-  --bg: #111114;
-  --bg-card: #1a1a1f;
+  --bg: #0f1012;
+  --background-subtle: #141519;
+  --bg-card: #1a1b1f;
   --bg-card-hover: #222228;
-  --border: #2a2a32;
-  --text-primary: #f0f0f3;
-  --text-secondary: #a0a0a8;
-  --text-tertiary: #6b6b6b;
-  --accent: #22d3ee;
-  --accent-hover: #67e8f9;
-  --accent-glow: rgba(34, 211, 238, 0.4);
-  --success: #30a46c;
-  --success-glow: rgba(48, 164, 108, 0.15);
-  --fail: #e5484d;
-  --fail-glow: rgba(229, 72, 77, 0.15);
+  --border: #ffffff08;
+  --text-primary: #e8e8eb;
+  --text-secondary: #8a8a93;
+  --text-tertiary: #55555e;
+  --accent: #2dd4bf;
+  --accent-hover: #5eead4;
+  --accent-glow: rgba(45, 212, 191, 0.15);
+  --accent-muted: #2dd4bf33;
+  --success: #34d399;
+  --success-glow: rgba(52, 211, 153, 0.15);
+  --fail: #f87171;
+  --fail-glow: rgba(248, 113, 113, 0.15);
 }
 
 * {
@@ -73,15 +75,15 @@ body::before {
 
 /* Glow text effect */
 .text-glow-accent {
-  text-shadow: 0 0 20px rgba(34, 211, 238, 0.5), 0 0 40px rgba(34, 211, 238, 0.2);
+  text-shadow: 0 0 20px rgba(45, 212, 191, 0.5), 0 0 40px rgba(45, 212, 191, 0.2);
 }
 
 .text-glow-green {
-  text-shadow: 0 0 20px rgba(48, 164, 108, 0.5);
+  text-shadow: 0 0 20px rgba(52, 211, 153, 0.5);
 }
 
 .text-glow-red {
-  text-shadow: 0 0 20px rgba(229, 72, 77, 0.5);
+  text-shadow: 0 0 20px rgba(248, 113, 113, 0.5);
 }
 
 /* Scrollbar styling */
@@ -105,7 +107,7 @@ body::before {
 
 /* Selection */
 ::selection {
-  background: rgba(34, 211, 238, 0.3);
+  background: rgba(45, 212, 191, 0.3);
   color: var(--text-primary);
 }
 

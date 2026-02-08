@@ -18,7 +18,7 @@ export default function Card({
   return (
     <div
       className={clsx(
-        "bg-card border border-border rounded-xl p-6",
+        "bg-card border border-transparent rounded-xl p-6",
         "transition-all duration-300",
         hover &&
           "hover:border-accent/30 hover:shadow-glow-accent cursor-pointer",

@@ -7,15 +7,10 @@ import { ProviderName, getProvider } from "@/lib/providers";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import Hero from "@/components/sections/Hero";
-import SocialProof from "@/components/sections/SocialProof";
-import HowItWorks from "@/components/sections/HowItWorks";
-import AttackCategories from "@/components/sections/AttackCategories";
-import ApiConfig from "@/components/sections/ApiConfig";
-import TestForm from "@/components/sections/TestForm";
+import HeroTest from "@/components/sections/HeroTest";
 import Results from "@/components/sections/Results";
+import AttackCategories from "@/components/sections/AttackCategories";
 import FAQ from "@/components/sections/FAQ";
-import FinalCTA from "@/components/sections/FinalCTA";
 
 export default function Home() {
   const [provider, setProvider] = useLocalStorage<ProviderName>(
@@ -62,28 +57,22 @@ export default function Home() {
   }, [test.status, test.results.length]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-bg">
       <Header />
       <main className="flex-1">
-        <Hero />
-        <SocialProof />
-        <HowItWorks />
-        <AttackCategories />
-        <ApiConfig
+        <HeroTest
           provider={provider}
           onProviderChange={handleProviderChange}
           model={model}
           onModelChange={setModel}
           apiKey={apiKey}
           onApiKeyChange={setApiKey}
-          disabled={test.status === "running"}
-        />
-        <TestForm
           systemPrompt={systemPrompt}
           onSystemPromptChange={setSystemPrompt}
           onSubmit={handleRunTest}
           disabled={!apiKey.trim() || !systemPrompt.trim()}
           isRunning={test.status === "running"}
+          progress={test.progress}
         />
         <Results
           status={test.status}
@@ -96,8 +85,8 @@ export default function Home() {
           onCollapseAll={test.collapseAll}
           onReset={test.reset}
         />
+        <AttackCategories />
         <FAQ />
-        <FinalCTA />
       </main>
       <Footer />
     </div>

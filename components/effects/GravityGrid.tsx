@@ -120,9 +120,9 @@ export default function GravityGrid() {
             const avgProx = (proximity + proxR) / 2;
 
             if (avgProx > 0.05) {
-              const red = Math.round(42 + (34 - 42) * avgProx);
-              const green = Math.round(42 + (211 - 42) * avgProx);
-              const blue = Math.round(50 + (238 - 50) * avgProx);
+              const red = Math.round(42 + (45 - 42) * avgProx);
+              const green = Math.round(42 + (212 - 42) * avgProx);
+              const blue = Math.round(50 + (191 - 50) * avgProx);
               const alpha = 0.4 + avgProx * 0.5;
               ctx.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
             } else {
@@ -142,9 +142,9 @@ export default function GravityGrid() {
             const avgProx = (proximity + proxB) / 2;
 
             if (avgProx > 0.05) {
-              const red = Math.round(42 + (34 - 42) * avgProx);
-              const green = Math.round(42 + (211 - 42) * avgProx);
-              const blue = Math.round(50 + (238 - 50) * avgProx);
+              const red = Math.round(42 + (45 - 42) * avgProx);
+              const green = Math.round(42 + (212 - 42) * avgProx);
+              const blue = Math.round(50 + (191 - 50) * avgProx);
               const alpha = 0.4 + avgProx * 0.5;
               ctx.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
             } else {

@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import clsx from "clsx";
 
 interface ScoreRingProps {
   score: number;
@@ -22,23 +21,17 @@ export default function ScoreRing({
   const ratio = total > 0 ? score / total : 0;
 
   const getColor = () => {
-    if (status === "running") return "#22d3ee";
-    if (ratio >= 0.8) return "#30a46c";
-    if (ratio >= 0.53) return "#22d3ee";
-    return "#e5484d";
+    if (status === "running") return "#2dd4bf";
+    if (score > 15) return "#34d399";
+    if (score >= 8) return "#2dd4bf";
+    return "#f87171";
   };
 
   const getGlow = () => {
-    if (status === "running") return "0 0 30px rgba(34, 211, 238, 0.3)";
-    if (ratio >= 0.8) return "0 0 30px rgba(48, 164, 108, 0.3)";
-    if (ratio >= 0.53) return "0 0 30px rgba(34, 211, 238, 0.3)";
-    return "0 0 30px rgba(229, 72, 77, 0.3)";
-  };
-
-  const getLabel = () => {
-    if (ratio >= 0.8) return "Strong";
-    if (ratio >= 0.53) return "Moderate";
-    return "Weak";
+    if (status === "running") return "0 0 30px rgba(45, 212, 191, 0.3)";
+    if (score > 15) return "0 0 30px rgba(52, 211, 153, 0.3)";
+    if (score >= 8) return "0 0 30px rgba(45, 212, 191, 0.3)";
+    return "0 0 30px rgba(248, 113, 113, 0.3)";
   };
 
   const color = getColor();
@@ -55,7 +48,7 @@ export default function ScoreRing({
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="#2a2a32"
+          stroke="#1a1b1f"
           strokeWidth={strokeWidth}
         />
         {/* Progress ring */}
@@ -90,21 +83,6 @@ export default function ScoreRing({
         <span className="text-text-tertiary text-sm mt-1">
           {status === "running" ? "testing..." : "attacks blocked"}
         </span>
-        {status === "complete" && (
-          <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className={clsx(
-              "text-xs font-medium mt-1",
-              ratio >= 0.8 && "text-success",
-              ratio >= 0.53 && ratio < 0.8 && "text-accent",
-              ratio < 0.53 && "text-fail"
-            )}
-          >
-            {getLabel()}
-          </motion.span>
-        )}
       </div>
     </div>
   );

@@ -9,14 +9,15 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   icon?: React.ReactNode;
   error?: string;
   masked?: boolean;
+  compact?: boolean;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, icon, error, masked, className, type, ...props }, ref) => {
+  ({ label, icon, error, masked, compact = false, className, type, ...props }, ref) => {
     const [showValue, setShowValue] = useState(false);
 
     return (
-      <div className="flex flex-col gap-1.5">
+      <div className={clsx(!compact && "flex flex-col gap-1.5", compact && "w-full")}>
         {label && (
           <label className="text-sm text-text-secondary font-medium">
             {label}
@@ -24,7 +25,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         <div className="relative">
           {icon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary">
+            <div className={clsx(
+              "absolute top-1/2 -translate-y-1/2 text-text-tertiary",
+              compact ? "left-2.5" : "left-3"
+            )}>
               {icon}
             </div>
           )}
@@ -32,12 +36,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             type={masked && !showValue ? "password" : type || "text"}
             className={clsx(
-              "w-full bg-card border border-border rounded-lg px-4 py-2.5",
+              "w-full bg-card border border-transparent rounded-lg",
               "text-text-primary placeholder:text-text-tertiary",
-              "focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30",
-              "transition-colors duration-200 font-mono text-sm",
-              icon && "pl-10",
-              masked && "pr-10",
+              "focus:outline-none focus:border-accent/40 focus:ring-1 focus:ring-accent/20",
+              "transition-colors duration-200 font-mono",
+              compact ? "px-3 py-2 text-xs" : "px-4 py-2.5 text-sm",
+              icon && (compact ? "pl-8" : "pl-10"),
+              masked && (compact ? "pr-8" : "pr-10"),
               error && "border-fail focus:border-fail focus:ring-fail/30",
               className
             )}
@@ -47,12 +52,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             <button
               type="button"
               onClick={() => setShowValue(!showValue)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary transition-colors"
+              className={clsx(
+                "absolute top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary transition-colors",
+                compact ? "right-2" : "right-3"
+              )}
             >
               {showValue ? (
-                <EyeOff className="w-4 h-4" />
+                <EyeOff className={compact ? "w-3.5 h-3.5" : "w-4 h-4"} />
               ) : (
-                <Eye className="w-4 h-4" />
+                <Eye className={compact ? "w-3.5 h-3.5" : "w-4 h-4"} />
               )}
             </button>
           )}

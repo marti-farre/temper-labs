@@ -30,14 +30,19 @@ export default function AttackResult({
 }: AttackResultProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="border border-border rounded-lg overflow-hidden"
+      initial={{ opacity: 0, x: passed ? 0 : -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={
+        passed
+          ? { duration: 0.3 }
+          : { type: "spring", stiffness: 400, damping: 15 }
+      }
+      className="rounded-lg overflow-hidden bg-card/50"
     >
       {/* Header - always visible */}
       <button
         onClick={onToggle}
-        className="flex items-center gap-3 w-full p-4 text-left hover:bg-card/50 transition-colors"
+        className="flex items-center gap-3 w-full p-4 text-left hover:bg-card transition-colors"
       >
         {/* Status indicator */}
         <div
@@ -93,7 +98,7 @@ export default function AttackResult({
             transition={{ duration: 0.2, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-4 space-y-3 border-t border-border pt-3">
+            <div className="px-4 pb-4 space-y-3 border-t border-white/5 pt-3">
               {/* Verdict */}
               <div>
                 <span className="text-xs text-text-tertiary uppercase tracking-wider">

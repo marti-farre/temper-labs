@@ -10,17 +10,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: "#111114",
-        card: "#1a1a1f",
+        bg: "#0f1012",
+        "bg-subtle": "#141519",
+        card: "#1a1b1f",
         "card-hover": "#222228",
-        border: "#2a2a32",
-        "text-primary": "#f0f0f3",
-        "text-secondary": "#a0a0a8",
-        "text-tertiary": "#6b6b6b",
-        accent: "#22d3ee",
-        "accent-hover": "#67e8f9",
-        success: "#30a46c",
-        fail: "#e5484d",
+        border: "#ffffff08",
+        "text-primary": "#e8e8eb",
+        "text-secondary": "#8a8a93",
+        "text-tertiary": "#55555e",
+        accent: "#2dd4bf",
+        "accent-hover": "#5eead4",
+        "accent-muted": "rgba(45, 212, 191, 0.2)",
+        success: "#34d399",
+        fail: "#f87171",
       },
       fontFamily: {
         serif: ["var(--font-serif)", "serif"],
@@ -32,10 +34,10 @@ const config: Config = {
         content: "800px",
       },
       boxShadow: {
-        "glow-accent": "0 0 20px rgba(34, 211, 238, 0.3)",
-        "glow-accent-lg": "0 0 40px rgba(34, 211, 238, 0.2)",
-        "glow-green": "0 0 20px rgba(48, 164, 108, 0.3)",
-        "glow-red": "0 0 20px rgba(229, 72, 77, 0.3)",
+        "glow-accent": "0 0 20px rgba(45, 212, 191, 0.3)",
+        "glow-accent-lg": "0 0 40px rgba(45, 212, 191, 0.2)",
+        "glow-green": "0 0 20px rgba(52, 211, 153, 0.3)",
+        "glow-red": "0 0 20px rgba(248, 113, 113, 0.3)",
       },
       animation: {
         "fade-in-up": "fadeInUp 0.5s ease-out",
@@ -48,8 +50,8 @@ const config: Config = {
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
         glowPulse: {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(34, 211, 238, 0.3)" },
-          "50%": { boxShadow: "0 0 40px rgba(34, 211, 238, 0.5)" },
+          "0%, 100%": { boxShadow: "0 0 20px rgba(45, 212, 191, 0.3)" },
+          "50%": { boxShadow: "0 0 40px rgba(45, 212, 191, 0.5)" },
         },
         shimmer: {
           "0%": { backgroundPosition: "-200% 0" },
