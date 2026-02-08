@@ -8,7 +8,7 @@ export interface AttackResult {
   id: number;
   name: string;
   category: string;
-  description: string;
+  description?: string;
   passed: boolean;
   reason: string;
   response: string;

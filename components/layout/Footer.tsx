@@ -7,7 +7,7 @@ export default function Footer() {
         Built by{" "}
         <span className="text-text-secondary">Mart&iacute;</span> &middot;{" "}
         <a
-          href="https://github.com"
+          href="https://github.com/marti-farre"
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-text-secondary transition-colors"
@@ -16,12 +16,12 @@ export default function Footer() {
         </a>{" "}
         &middot;{" "}
         <a
-          href="https://twitter.com"
+          href="https://www.linkedin.com/in/marti-farre/"
           target="_blank"
           rel="noopener noreferrer"
           className="hover:text-text-secondary transition-colors"
         >
-          Twitter
+          LinkedIn
         </a>
       </p>
     </footer>

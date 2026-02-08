@@ -2,21 +2,23 @@
 
 import { motion } from "framer-motion";
 import {
-  Code,
-  Unlock,
   Eye,
   UserCog,
+  Theater,
   Binary,
+  TrendingUp,
+  SearchCode,
   Heart,
 } from "lucide-react";
 import { CATEGORIES } from "@/lib/attacks";
 
 const iconMap: Record<string, React.ElementType> = {
-  Code,
-  Unlock,
   Eye,
   UserCog,
+  Theater,
   Binary,
+  TrendingUp,
+  SearchCode,
   Heart,
 };
 
@@ -40,7 +42,7 @@ export default function AttackCategories() {
           viewport={{ once: true }}
           className="text-text-tertiary text-xs uppercase tracking-widest mb-4"
         >
-          20 attacks, 6 categories
+          25 attacks, 7 categories
         </motion.p>
 
         <motion.div
@@ -48,10 +50,10 @@ export default function AttackCategories() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"
         >
           {CATEGORIES.map((cat) => {
-            const Icon = iconMap[cat.icon] || Code;
+            const Icon = iconMap[cat.icon] || Eye;
             return (
               <motion.div
                 key={cat.name}

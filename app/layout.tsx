@@ -24,18 +24,18 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "TemperLLM — Red Team Your LLM in 30 Seconds",
   description:
-    "Test your system prompt against 20 adversarial attacks. Find vulnerabilities before hackers do. Supports OpenAI, Anthropic, and Mistral.",
+    "Test your system prompt against 25 adversarial attacks. Find vulnerabilities before hackers do. Supports OpenAI, Anthropic, and Mistral.",
   openGraph: {
     title: "TemperLLM — Break Your AI Before Hackers Do",
     description:
-      "Red team your LLM system prompts with 20 adversarial attacks across 6 categories.",
+      "Red team your LLM system prompts with 25 adversarial attacks across 7 categories.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "TemperLLM — Red Team Your LLM",
     description:
-      "Test your system prompt against 20 adversarial attacks. Find vulnerabilities before hackers do.",
+      "Test your system prompt against 25 adversarial attacks. Find vulnerabilities before hackers do.",
   },
 };
 

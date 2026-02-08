@@ -74,19 +74,16 @@ export default function HeroTest({
   }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden py-20">
+    <section className="relative z-0 min-h-screen flex items-center justify-center overflow-hidden py-20">
       {/* Grid background */}
       <GravityGrid />
       {/* Gradient fade at bottom */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-bg pointer-events-none" />
-      {/* Center glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/5 rounded-full blur-3xl pointer-events-none" />
-
       <motion.div
         variants={stagger}
         initial="hidden"
         animate="show"
-        className="relative z-10 w-full max-w-2xl mx-auto px-6"
+        className="relative z-10 w-full max-w-3xl mx-auto px-6"
       >
         {/* Badge */}
         {count !== null && count > 0 && (
@@ -96,7 +93,7 @@ export default function HeroTest({
               <span className="font-mono text-accent">
                 {animatedCount.toLocaleString("en-US")}
               </span>{" "}
-              prompts tested
+              prompts tested &mdash; avg score: 14/25
             </span>
           </motion.div>
         )}

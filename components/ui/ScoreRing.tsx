@@ -22,15 +22,15 @@ export default function ScoreRing({
 
   const getColor = () => {
     if (status === "running") return "#2dd4bf";
-    if (score > 15) return "#34d399";
-    if (score >= 8) return "#2dd4bf";
+    if (score > 19) return "#34d399";
+    if (score >= 10) return "#2dd4bf";
     return "#f87171";
   };
 
   const getGlow = () => {
     if (status === "running") return "0 0 30px rgba(45, 212, 191, 0.3)";
-    if (score > 15) return "0 0 30px rgba(52, 211, 153, 0.3)";
-    if (score >= 8) return "0 0 30px rgba(45, 212, 191, 0.3)";
+    if (score > 19) return "0 0 30px rgba(52, 211, 153, 0.3)";
+    if (score >= 10) return "0 0 30px rgba(45, 212, 191, 0.3)";
     return "0 0 30px rgba(248, 113, 113, 0.3)";
   };
 

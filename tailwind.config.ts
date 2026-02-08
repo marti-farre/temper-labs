@@ -10,7 +10,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: "#0f1012",
+        bg: "#0c0d0f",
         "bg-subtle": "#141519",
         card: "#1a1b1f",
         "card-hover": "#222228",
@@ -30,7 +30,7 @@ const config: Config = {
         mono: ["var(--font-mono)", "monospace"],
       },
       maxWidth: {
-        container: "1200px",
+        container: "1400px",
         content: "800px",
       },
       boxShadow: {

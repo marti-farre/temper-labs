@@ -12,17 +12,17 @@ const faqItems = [
   {
     question: "How does the scoring work?",
     answer:
-      "We run 20 adversarial attacks against your system prompt. For each attack, we send the attack prompt to your model, then use the same model to judge whether the attack was blocked or succeeded. Your score is the number of attacks successfully blocked out of 20.",
+      "We run 25 adversarial attacks against your system prompt. For each attack, we send the attack prompt to your model, then use the same model to judge whether the attack was blocked or succeeded. Your score is the number of attacks successfully blocked out of 25.",
   },
   {
     question: "What attacks do you test?",
     answer:
-      "We test 20 attacks across 6 categories: Prompt Injection (4), Prompt Leaking (4), Jailbreaking (4), Context Manipulation (3), Encoding (3), and Emotional Manipulation (2). These represent the most common real-world adversarial techniques used against production LLMs.",
+      "We test 25 attacks across 7 categories: Prompt Leaking (5), Context Manipulation (4), Roleplay (4), Encoding (4), Crescendo (4), Evaluation Exploit (2), and Emotional (2). These are based on 2025\u20132026 adversarial research techniques used against production LLMs.",
   },
   {
     question: "How much does it cost?",
     answer:
-      "TemperLLM itself is free. You only pay for the API calls to your chosen provider. Each test run makes approximately 40 API calls (20 attacks + 20 judge evaluations). With GPT-4o-mini, a full test costs roughly $0.02\u2013$0.05. With larger models, it may cost $0.15\u2013$0.40.",
+      "TemperLLM itself is free. You only pay for the API calls to your chosen provider. Each test run makes approximately 50 API calls (25 attacks + 25 judge evaluations). With GPT-4o-mini, a full test costs roughly $0.03\u2013$0.06. With larger models, it may cost $0.20\u2013$0.50.",
   },
 ];
 
