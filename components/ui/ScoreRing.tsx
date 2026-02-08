@@ -22,17 +22,17 @@ export default function ScoreRing({
   const ratio = total > 0 ? score / total : 0;
 
   const getColor = () => {
-    if (status === "running") return "#e5484d";
-    if (ratio >= 0.8) return "#22c55e";
-    if (ratio >= 0.53) return "#e5484d";
-    return "#ef4444";
+    if (status === "running") return "#22d3ee";
+    if (ratio >= 0.8) return "#30a46c";
+    if (ratio >= 0.53) return "#22d3ee";
+    return "#e5484d";
   };
 
   const getGlow = () => {
-    if (status === "running") return "0 0 30px rgba(229, 72, 77, 0.3)";
-    if (ratio >= 0.8) return "0 0 30px rgba(34, 197, 94, 0.3)";
-    if (ratio >= 0.53) return "0 0 30px rgba(229, 72, 77, 0.3)";
-    return "0 0 30px rgba(239, 68, 68, 0.3)";
+    if (status === "running") return "0 0 30px rgba(34, 211, 238, 0.3)";
+    if (ratio >= 0.8) return "0 0 30px rgba(48, 164, 108, 0.3)";
+    if (ratio >= 0.53) return "0 0 30px rgba(34, 211, 238, 0.3)";
+    return "0 0 30px rgba(229, 72, 77, 0.3)";
   };
 
   const getLabel = () => {

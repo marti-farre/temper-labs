@@ -10,9 +10,9 @@ interface GridPoint {
 }
 
 const SPACING = 60;
-const INFLUENCE_RADIUS = 150;
-const STRENGTH = 0.15;
-const EASE_BACK = 0.08;
+const INFLUENCE_RADIUS = 220;
+const STRENGTH = 0.45;
+const EASE_BACK = 0.12;
 
 export default function GravityGrid() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -88,14 +88,17 @@ export default function GravityGrid() {
           const dy = my - pt.originY;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
+          let targetX = pt.originX;
+          let targetY = pt.originY;
+
           if (dist < INFLUENCE_RADIUS) {
             const force = (1 - dist / INFLUENCE_RADIUS) * STRENGTH;
-            pt.x += (mx - pt.x) * force;
-            pt.y += (my - pt.y) * force;
-          } else {
-            pt.x += (pt.originX - pt.x) * EASE_BACK;
-            pt.y += (pt.originY - pt.y) * EASE_BACK;
+            targetX = pt.originX + dx * force;
+            targetY = pt.originY + dy * force;
           }
+
+          pt.x += (targetX - pt.x) * EASE_BACK;
+          pt.y += (targetY - pt.y) * EASE_BACK;
         }
       }
 
@@ -117,10 +120,10 @@ export default function GravityGrid() {
             const avgProx = (proximity + proxR) / 2;
 
             if (avgProx > 0.05) {
-              const red = Math.round(42 + (229 - 42) * avgProx);
-              const green = Math.round(42 + (72 - 42) * avgProx);
-              const blue = Math.round(50 + (77 - 50) * avgProx);
-              const alpha = 0.4 + avgProx * 0.4;
+              const red = Math.round(42 + (34 - 42) * avgProx);
+              const green = Math.round(42 + (211 - 42) * avgProx);
+              const blue = Math.round(50 + (238 - 50) * avgProx);
+              const alpha = 0.4 + avgProx * 0.5;
               ctx.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
             } else {
               ctx.strokeStyle = "rgba(42, 42, 50, 0.4)";
@@ -139,10 +142,10 @@ export default function GravityGrid() {
             const avgProx = (proximity + proxB) / 2;
 
             if (avgProx > 0.05) {
-              const red = Math.round(42 + (229 - 42) * avgProx);
-              const green = Math.round(42 + (72 - 42) * avgProx);
-              const blue = Math.round(50 + (77 - 50) * avgProx);
-              const alpha = 0.4 + avgProx * 0.4;
+              const red = Math.round(42 + (34 - 42) * avgProx);
+              const green = Math.round(42 + (211 - 42) * avgProx);
+              const blue = Math.round(50 + (238 - 50) * avgProx);
+              const alpha = 0.4 + avgProx * 0.5;
               ctx.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
             } else {
               ctx.strokeStyle = "rgba(42, 42, 50, 0.4)";

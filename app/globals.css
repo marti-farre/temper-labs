@@ -7,16 +7,16 @@
   --bg-card: #1a1a1f;
   --bg-card-hover: #222228;
   --border: #2a2a32;
-  --text-primary: #fafafa;
-  --text-secondary: #a1a1a1;
+  --text-primary: #f0f0f3;
+  --text-secondary: #a0a0a8;
   --text-tertiary: #6b6b6b;
-  --accent: #e5484d;
-  --accent-hover: #f26669;
-  --accent-glow: rgba(229, 72, 77, 0.15);
-  --success: #22c55e;
-  --success-glow: rgba(34, 197, 94, 0.15);
-  --fail: #ef4444;
-  --fail-glow: rgba(239, 68, 68, 0.15);
+  --accent: #22d3ee;
+  --accent-hover: #67e8f9;
+  --accent-glow: rgba(34, 211, 238, 0.4);
+  --success: #30a46c;
+  --success-glow: rgba(48, 164, 108, 0.15);
+  --fail: #e5484d;
+  --fail-glow: rgba(229, 72, 77, 0.15);
 }
 
 * {
@@ -73,15 +73,15 @@ body::before {
 
 /* Glow text effect */
 .text-glow-accent {
-  text-shadow: 0 0 20px rgba(229, 72, 77, 0.5), 0 0 40px rgba(229, 72, 77, 0.2);
+  text-shadow: 0 0 20px rgba(34, 211, 238, 0.5), 0 0 40px rgba(34, 211, 238, 0.2);
 }
 
 .text-glow-green {
-  text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+  text-shadow: 0 0 20px rgba(48, 164, 108, 0.5);
 }
 
 .text-glow-red {
-  text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+  text-shadow: 0 0 20px rgba(229, 72, 77, 0.5);
 }
 
 /* Scrollbar styling */
@@ -105,7 +105,7 @@ body::before {
 
 /* Selection */
 ::selection {
-  background: rgba(229, 72, 77, 0.3);
+  background: rgba(34, 211, 238, 0.3);
   color: var(--text-primary);
 }
 
