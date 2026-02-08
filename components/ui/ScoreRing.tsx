@@ -22,16 +22,16 @@ export default function ScoreRing({
   const ratio = total > 0 ? score / total : 0;
 
   const getColor = () => {
-    if (status === "running") return "#f97316";
+    if (status === "running") return "#e5484d";
     if (ratio >= 0.8) return "#22c55e";
-    if (ratio >= 0.53) return "#f97316";
+    if (ratio >= 0.53) return "#e5484d";
     return "#ef4444";
   };
 
   const getGlow = () => {
-    if (status === "running") return "0 0 30px rgba(249, 115, 22, 0.3)";
+    if (status === "running") return "0 0 30px rgba(229, 72, 77, 0.3)";
     if (ratio >= 0.8) return "0 0 30px rgba(34, 197, 94, 0.3)";
-    if (ratio >= 0.53) return "0 0 30px rgba(249, 115, 22, 0.3)";
+    if (ratio >= 0.53) return "0 0 30px rgba(229, 72, 77, 0.3)";
     return "0 0 30px rgba(239, 68, 68, 0.3)";
   };
 
@@ -55,7 +55,7 @@ export default function ScoreRing({
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="#262626"
+          stroke="#2a2a32"
           strokeWidth={strokeWidth}
         />
         {/* Progress ring */}

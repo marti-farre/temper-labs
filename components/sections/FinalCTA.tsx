@@ -25,7 +25,7 @@ export default function FinalCTA() {
         <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-text-primary leading-tight">
           Don&apos;t let attackers find your
           <br />
-          <span className="text-accent text-glow-orange">
+          <span className="text-accent text-glow-accent">
             vulnerabilities first
           </span>
         </h2>

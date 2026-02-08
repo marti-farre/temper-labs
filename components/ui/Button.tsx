@@ -19,7 +19,7 @@ interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-accent text-white hover:bg-orange-600 border border-accent/50",
+    "bg-accent text-white hover:bg-accent-hover border border-accent/50",
   secondary:
     "bg-transparent text-text-primary border border-border hover:border-text-tertiary hover:bg-card",
   ghost:
@@ -57,7 +57,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           "disabled:opacity-50 disabled:cursor-not-allowed",
           variantStyles[variant],
           sizeStyles[size],
-          glow && variant === "primary" && "shadow-glow-orange hover:shadow-glow-orange-lg",
+          glow && variant === "primary" && "shadow-glow-accent hover:shadow-glow-accent-lg",
           className
         )}
         disabled={disabled || loading}

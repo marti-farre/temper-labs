@@ -74,7 +74,7 @@ export default function TestForm({
             <button
               type="button"
               onClick={() => onSystemPromptChange(EXAMPLE_SYSTEM_PROMPT)}
-              className="text-xs text-accent hover:text-orange-400 transition-colors"
+              className="text-xs text-accent hover:text-accent-hover transition-colors"
               disabled={isRunning}
             >
               Try an example prompt

@@ -21,7 +21,7 @@ export default function Card({
         "bg-card border border-border rounded-xl p-6",
         "transition-all duration-300",
         hover &&
-          "hover:border-accent/30 hover:shadow-glow-orange cursor-pointer",
+          "hover:border-accent/30 hover:shadow-glow-accent cursor-pointer",
         gradient && "gradient-border border-transparent",
         className
       )}

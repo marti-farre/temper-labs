@@ -10,13 +10,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: "#0a0a0a",
-        card: "#141414",
-        border: "#262626",
+        bg: "#111114",
+        card: "#1a1a1f",
+        "card-hover": "#222228",
+        border: "#2a2a32",
         "text-primary": "#fafafa",
         "text-secondary": "#a1a1a1",
         "text-tertiary": "#6b6b6b",
-        accent: "#f97316",
+        accent: "#e5484d",
+        "accent-hover": "#f26669",
         success: "#22c55e",
         fail: "#ef4444",
       },
@@ -30,8 +32,8 @@ const config: Config = {
         content: "800px",
       },
       boxShadow: {
-        "glow-orange": "0 0 20px rgba(249, 115, 22, 0.3)",
-        "glow-orange-lg": "0 0 40px rgba(249, 115, 22, 0.2)",
+        "glow-accent": "0 0 20px rgba(229, 72, 77, 0.3)",
+        "glow-accent-lg": "0 0 40px rgba(229, 72, 77, 0.2)",
         "glow-green": "0 0 20px rgba(34, 197, 94, 0.3)",
         "glow-red": "0 0 20px rgba(239, 68, 68, 0.3)",
       },
@@ -46,8 +48,8 @@ const config: Config = {
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
         glowPulse: {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(249, 115, 22, 0.3)" },
-          "50%": { boxShadow: "0 0 40px rgba(249, 115, 22, 0.5)" },
+          "0%, 100%": { boxShadow: "0 0 20px rgba(229, 72, 77, 0.3)" },
+          "50%": { boxShadow: "0 0 40px rgba(229, 72, 77, 0.5)" },
         },
         shimmer: {
           "0%": { backgroundPosition: "-200% 0" },

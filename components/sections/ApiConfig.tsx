@@ -106,7 +106,7 @@ export default function ApiConfig({
                 href={currentProvider.docsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-accent hover:text-orange-400 transition-colors"
+                className="inline-flex items-center gap-1 text-xs text-accent hover:text-accent-hover transition-colors"
               >
                 Get an API key
                 <ExternalLink className="w-3 h-3" />

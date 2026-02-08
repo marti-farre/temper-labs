@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Zap } from "lucide-react";
 import Button from "@/components/ui/Button";
+import GravityGrid from "@/components/effects/GravityGrid";
 
 const stagger = {
   hidden: {},
@@ -32,7 +33,7 @@ export default function Hero() {
   return (
     <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
       {/* Grid background */}
-      <div className="absolute inset-0 hero-grid" />
+      <GravityGrid />
       {/* Radial fade */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-bg" />
       {/* Center glow */}
@@ -62,7 +63,7 @@ export default function Hero() {
         >
           Red team your LLM{" "}
           <br className="hidden sm:block" />
-          <span className="text-accent text-glow-orange">in 30 seconds</span>
+          <span className="text-accent text-glow-accent">in 30 seconds</span>
         </motion.h1>
 
         {/* Subtitle */}
