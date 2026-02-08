@@ -31,7 +31,7 @@ export default function ApiConfig({
   const currentProvider = getProvider(provider);
 
   return (
-    <section id="config" className="section-padding">
+    <section id="config" className="pt-24 pb-8 px-6 md:px-8">
       <div className="section-container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

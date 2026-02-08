@@ -25,7 +25,7 @@ export default function TestForm({
   const charCount = systemPrompt.length;
 
   return (
-    <section id="test" className="section-padding">
+    <section id="test" className="pt-8 pb-24 px-6 md:px-8">
       <div className="section-container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
