@@ -10,10 +10,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: "#0c0d0f",
+        bg: "#0f1514",
         "bg-subtle": "#141519",
-        card: "#1a1b1f",
-        "card-hover": "#222228",
+        card: "#131816",
+        "card-hover": "#1c1f1e",
         border: "#ffffff08",
         "text-primary": "#e8e8eb",
         "text-secondary": "#8a8a93",
@@ -22,6 +22,7 @@ const config: Config = {
         "accent-hover": "#5eead4",
         "accent-muted": "rgba(45, 212, 191, 0.2)",
         success: "#34d399",
+        warning: "#fbbf24",
         fail: "#f87171",
       },
       fontFamily: {
@@ -38,6 +39,7 @@ const config: Config = {
         "glow-accent-lg": "0 0 40px rgba(45, 212, 191, 0.2)",
         "glow-green": "0 0 20px rgba(52, 211, 153, 0.3)",
         "glow-red": "0 0 20px rgba(248, 113, 113, 0.3)",
+        "glow-amber": "0 0 20px rgba(251, 191, 36, 0.3)",
       },
       animation: {
         "fade-in-up": "fadeInUp 0.5s ease-out",

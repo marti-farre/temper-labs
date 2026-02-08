@@ -2,6 +2,7 @@
 
 import { useReducer, useCallback } from "react";
 import { ProviderName } from "@/lib/providers";
+import { Verdict } from "@/lib/types";
 
 export interface AttackResult {
   index: number;
@@ -9,7 +10,7 @@ export interface AttackResult {
   name: string;
   category: string;
   description?: string;
-  passed: boolean;
+  verdict: Verdict;
   reason: string;
   response: string;
   error?: boolean;

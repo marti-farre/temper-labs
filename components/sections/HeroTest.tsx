@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Zap, Lock, Info, ExternalLink } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Select from "@/components/ui/Select";
@@ -124,12 +124,31 @@ export default function HeroTest({
               disabled={isRunning}
               className="w-full min-h-[140px] bg-card/80 backdrop-blur-sm border border-transparent rounded-xl px-5 py-4 text-text-primary placeholder:text-text-tertiary font-mono text-sm leading-relaxed focus:outline-none focus:border-accent/40 focus:ring-1 focus:ring-accent/20 transition-colors resize-y disabled:opacity-50"
             />
-            <div className="absolute bottom-3 right-3">
-              <span className="text-text-tertiary text-xs font-mono">
-                {charCount.toLocaleString("en-US")} /{" "}
-                {MAX_CHARS.toLocaleString("en-US")}
-              </span>
-            </div>
+            {/* Attack preview overlay during testing */}
+            {isRunning && progress > 0 && progress <= attacks.length && (
+              <div className="absolute inset-0 flex items-start px-5 py-4 pointer-events-none rounded-xl overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={progress}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 0.6, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.3 }}
+                    className="text-text-tertiary font-mono text-sm leading-relaxed line-clamp-4"
+                  >
+                    {attacks[progress - 1]?.prompt}
+                  </motion.p>
+                </AnimatePresence>
+              </div>
+            )}
+            {!isRunning && (
+              <div className="absolute bottom-3 right-3">
+                <span className="text-text-tertiary text-xs font-mono">
+                  {charCount.toLocaleString("en-US")} /{" "}
+                  {MAX_CHARS.toLocaleString("en-US")}
+                </span>
+              </div>
+            )}
           </div>
           <div className="mt-2 flex items-center justify-between">
             <button

@@ -12,7 +12,7 @@ const faqItems = [
   {
     question: "How does the scoring work?",
     answer:
-      "We run 25 adversarial attacks against your system prompt. For each attack, we send the attack prompt to your model, then use the same model to judge whether the attack was blocked or succeeded. Your score is the number of attacks successfully blocked out of 25.",
+      "We run 25 adversarial attacks against your system prompt. For each attack, we send the attack prompt to your model, then use the same model to judge the result as BLOCKED (full defense), WARNING (partial defense — refused but confirmed having restrictions), or FAILED (attack succeeded). Your score counts only fully blocked attacks out of 25.",
   },
   {
     question: "What attacks do you test?",

@@ -40,7 +40,7 @@ export default function AttackCategories() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="text-text-tertiary text-xs uppercase tracking-widest mb-4"
+          className="text-text-tertiary text-xs uppercase tracking-widest mb-4 text-center"
         >
           25 attacks, 7 categories
         </motion.p>
@@ -50,29 +50,57 @@ export default function AttackCategories() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true }}
-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"
+          className="flex flex-col items-center gap-3"
         >
-          {CATEGORIES.map((cat) => {
-            const Icon = iconMap[cat.icon] || Eye;
-            return (
-              <motion.div
-                key={cat.name}
-                variants={itemVariants}
-                className="group relative flex flex-col items-center gap-2 p-3 rounded-lg bg-card/50 hover:bg-card transition-colors cursor-default"
-                title={cat.description}
-              >
-                <div className="w-8 h-8 rounded-md bg-accent/10 flex items-center justify-center">
-                  <Icon className="w-4 h-4 text-accent" />
-                </div>
-                <span className="text-text-secondary text-xs text-center leading-tight">
-                  {cat.name}
-                </span>
-                <span className="text-text-tertiary text-[10px] font-mono">
-                  {cat.count}
-                </span>
-              </motion.div>
-            );
-          })}
+          {/* First row: 4 items */}
+          <div className="flex justify-center gap-3 flex-wrap">
+            {CATEGORIES.slice(0, 4).map((cat) => {
+              const Icon = iconMap[cat.icon] || Eye;
+              return (
+                <motion.div
+                  key={cat.name}
+                  variants={itemVariants}
+                  className="group relative flex flex-col items-center gap-2 p-3 rounded-lg bg-card/50 hover:bg-card transition-colors cursor-default w-32"
+                  title={cat.description}
+                >
+                  <div className="w-8 h-8 rounded-md bg-white/5 flex items-center justify-center">
+                    <Icon className="w-4 h-4 text-gray-400" />
+                  </div>
+                  <span className="text-text-secondary text-xs text-center leading-tight">
+                    {cat.name}
+                  </span>
+                  <span className="text-text-tertiary text-[10px] font-mono">
+                    {cat.count}
+                  </span>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Second row: 3 items, centered */}
+          <div className="flex justify-center gap-3 flex-wrap">
+            {CATEGORIES.slice(4, 7).map((cat) => {
+              const Icon = iconMap[cat.icon] || Eye;
+              return (
+                <motion.div
+                  key={cat.name}
+                  variants={itemVariants}
+                  className="group relative flex flex-col items-center gap-2 p-3 rounded-lg bg-card/50 hover:bg-card transition-colors cursor-default w-32"
+                  title={cat.description}
+                >
+                  <div className="w-8 h-8 rounded-md bg-white/5 flex items-center justify-center">
+                    <Icon className="w-4 h-4 text-gray-400" />
+                  </div>
+                  <span className="text-text-secondary text-xs text-center leading-tight">
+                    {cat.name}
+                  </span>
+                  <span className="text-text-tertiary text-[10px] font-mono">
+                    {cat.count}
+                  </span>
+                </motion.div>
+              );
+            })}
+          </div>
         </motion.div>
       </div>
     </section>

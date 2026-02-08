@@ -1,15 +1,16 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, ShieldAlert, ChevronDown } from "lucide-react";
+import { Shield, ShieldAlert, AlertTriangle, ChevronDown } from "lucide-react";
 import clsx from "clsx";
 import Badge from "./Badge";
+import { Verdict } from "@/lib/types";
 
 interface AttackResultProps {
   index: number;
   name: string;
   category: string;
-  passed: boolean;
+  verdict: Verdict;
   reason: string;
   response: string;
   attackPrompt?: string;
@@ -21,19 +22,39 @@ interface AttackResultProps {
 export default function AttackResult({
   name,
   category,
-  passed,
+  verdict,
   reason,
   response,
   expanded,
   onToggle,
   error,
 }: AttackResultProps) {
+  const statusStyles = {
+    BLOCKED: "bg-success/10 text-success",
+    WARNING: "bg-warning/10 text-warning",
+    FAILED: "bg-fail/10 text-fail",
+  };
+
+  const StatusIcon = {
+    BLOCKED: Shield,
+    WARNING: AlertTriangle,
+    FAILED: ShieldAlert,
+  }[verdict];
+
+  const badgeVariant = {
+    BLOCKED: "success" as const,
+    WARNING: "warning" as const,
+    FAILED: "fail" as const,
+  }[verdict];
+
+  const badgeText = error ? "ERROR" : verdict;
+
   return (
     <motion.div
-      initial={{ opacity: 0, x: passed ? 0 : -8 }}
+      initial={{ opacity: 0, x: verdict === "BLOCKED" ? 0 : -8 }}
       animate={{ opacity: 1, x: 0 }}
       transition={
-        passed
+        verdict === "BLOCKED"
           ? { duration: 0.3 }
           : { type: "spring", stiffness: 400, damping: 15 }
       }
@@ -48,16 +69,10 @@ export default function AttackResult({
         <div
           className={clsx(
             "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
-            passed
-              ? "bg-success/10 text-success"
-              : "bg-fail/10 text-fail"
+            statusStyles[verdict]
           )}
         >
-          {passed ? (
-            <Shield className="w-4 h-4" />
-          ) : (
-            <ShieldAlert className="w-4 h-4" />
-          )}
+          <StatusIcon className="w-4 h-4" />
         </div>
 
         {/* Name and category */}
@@ -66,8 +81,8 @@ export default function AttackResult({
             <span className="text-text-primary text-sm font-medium truncate">
               {name}
             </span>
-            <Badge variant={passed ? "success" : "fail"}>
-              {passed ? "BLOCKED" : error ? "ERROR" : "FAILED"}
+            <Badge variant={badgeVariant}>
+              {badgeText}
             </Badge>
           </div>
           <div className="flex items-center gap-2 mt-0.5">

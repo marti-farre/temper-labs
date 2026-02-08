@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-type BadgeVariant = "default" | "success" | "fail" | "accent";
+type BadgeVariant = "default" | "success" | "warning" | "fail" | "accent";
 
 interface BadgeProps {
   children: React.ReactNode;
@@ -11,6 +11,7 @@ interface BadgeProps {
 const variantStyles: Record<BadgeVariant, string> = {
   default: "bg-border text-text-secondary",
   success: "bg-success/10 text-success border-success/20",
+  warning: "bg-warning/10 text-warning border-warning/20",
   fail: "bg-fail/10 text-fail border-fail/20",
   accent: "bg-accent/10 text-accent border-accent/20",
 };

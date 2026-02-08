@@ -120,13 +120,15 @@ export default function GravityGrid() {
             const avgProx = (proximity + proxR) / 2;
 
             if (avgProx > 0.05) {
-              const red = Math.round(42 + (45 - 42) * avgProx);
-              const green = Math.round(42 + (212 - 42) * avgProx);
-              const blue = Math.round(50 + (191 - 50) * avgProx);
-              const alpha = 0.4 + avgProx * 0.5;
+              // Near mouse: interpolate from gray to subtle teal
+              const red = Math.round(60 + (45 - 60) * avgProx);
+              const green = Math.round(60 + (212 - 60) * avgProx);
+              const blue = Math.round(65 + (191 - 65) * avgProx);
+              const alpha = 0.03 + avgProx * 0.35;
               ctx.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
             } else {
-              ctx.strokeStyle = "rgba(42, 42, 50, 0.4)";
+              // Default: barely visible gray
+              ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
             }
             ctx.beginPath();
             ctx.moveTo(pt.x, pt.y);
@@ -142,13 +144,13 @@ export default function GravityGrid() {
             const avgProx = (proximity + proxB) / 2;
 
             if (avgProx > 0.05) {
-              const red = Math.round(42 + (45 - 42) * avgProx);
-              const green = Math.round(42 + (212 - 42) * avgProx);
-              const blue = Math.round(50 + (191 - 50) * avgProx);
-              const alpha = 0.4 + avgProx * 0.5;
+              const red = Math.round(60 + (45 - 60) * avgProx);
+              const green = Math.round(60 + (212 - 60) * avgProx);
+              const blue = Math.round(65 + (191 - 65) * avgProx);
+              const alpha = 0.03 + avgProx * 0.35;
               ctx.strokeStyle = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
             } else {
-              ctx.strokeStyle = "rgba(42, 42, 50, 0.4)";
+              ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
             }
             ctx.beginPath();
             ctx.moveTo(pt.x, pt.y);

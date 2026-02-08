@@ -12,10 +12,10 @@ interface ScoreRingProps {
 export default function ScoreRing({
   score,
   total,
-  size = 180,
+  size = 120,
   status,
 }: ScoreRingProps) {
-  const strokeWidth = 8;
+  const strokeWidth = 6;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const ratio = total > 0 ? score / total : 0;
@@ -48,7 +48,7 @@ export default function ScoreRing({
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="#1a1b1f"
+          stroke="#131816"
           strokeWidth={strokeWidth}
         />
         {/* Progress ring */}
@@ -72,7 +72,7 @@ export default function ScoreRing({
       {/* Center text */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <motion.span
-          className="text-4xl font-serif font-medium"
+          className="text-xl font-serif font-medium"
           style={{ color }}
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -80,7 +80,7 @@ export default function ScoreRing({
         >
           {score}/{total}
         </motion.span>
-        <span className="text-text-tertiary text-sm mt-1">
+        <span className="text-text-tertiary text-[10px] mt-0.5">
           {status === "running" ? "testing..." : "attacks blocked"}
         </span>
       </div>

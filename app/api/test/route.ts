@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
             response
           );
 
-          if (verdict.passed) score++;
+          if (verdict.verdict === "BLOCKED") score++;
 
           const result = {
             index: i,
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
             name: attack.name,
             category: attack.category,
             description: attack.description,
-            passed: verdict.passed,
+            verdict: verdict.verdict,
             reason: verdict.reason,
             response,
           };
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
             name: attack.name,
             category: attack.category,
             description: attack.description,
-            passed: false,
+            verdict: "FAILED" as const,
             reason:
               err instanceof Error
                 ? err.message
