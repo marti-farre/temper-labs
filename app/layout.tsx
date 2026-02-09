@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, DM_Sans, JetBrains_Mono } from "next/font/google";
+import { Instrument_Serif, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 const instrumentSerif = Instrument_Serif({
@@ -9,7 +9,7 @@ const instrumentSerif = Instrument_Serif({
   display: "swap",
 });
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
@@ -22,20 +22,20 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TemperLLM — Red Team Your LLM in 30 Seconds",
+  title: "Temper — Security Testing for AI Agents and LLM Prompts",
   description:
-    "Test your system prompt against 25 adversarial attacks. Find vulnerabilities before hackers do. Supports OpenAI, Anthropic, and Mistral.",
+    "Test your AI agents and system prompts against adversarial attacks. Find vulnerabilities before hackers do. Supports OpenAI, Anthropic, and Mistral.",
   openGraph: {
-    title: "TemperLLM — Break Your AI Before Hackers Do",
+    title: "Temper — Break Your AI Before Hackers Do",
     description:
-      "Red team your LLM system prompts with 25 adversarial attacks across 7 categories.",
+      "Security testing for AI agents and LLM prompts with adversarial attacks.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "TemperLLM — Red Team Your LLM",
+    title: "Temper — Security Testing for AI",
     description:
-      "Test your system prompt against 25 adversarial attacks. Find vulnerabilities before hackers do.",
+      "Test your AI agents and system prompts against adversarial attacks. Find vulnerabilities before hackers do.",
   },
 };
 
@@ -45,9 +45,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body
-        className={`${instrumentSerif.variable} ${dmSans.variable} ${jetbrainsMono.variable} font-sans antialiased`}
+        className={`${instrumentSerif.variable} ${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
         {children}
       </body>

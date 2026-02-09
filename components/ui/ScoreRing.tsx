@@ -12,78 +12,32 @@ interface ScoreRingProps {
 export default function ScoreRing({
   score,
   total,
-  size = 120,
   status,
 }: ScoreRingProps) {
-  const strokeWidth = 6;
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const ratio = total > 0 ? score / total : 0;
-
   const getColor = () => {
-    if (status === "running") return "#2dd4bf";
-    if (score > 19) return "#34d399";
-    if (score >= 10) return "#2dd4bf";
-    return "#f87171";
+    if (status === "running") return "text-accent";
+    const ratio = total > 0 ? score / total : 0;
+    if (ratio > 0.8) return "text-success";
+    if (ratio >= 0.4) return "text-warning";
+    return "text-fail";
   };
-
-  const getGlow = () => {
-    if (status === "running") return "0 0 30px rgba(45, 212, 191, 0.3)";
-    if (score > 19) return "0 0 30px rgba(52, 211, 153, 0.3)";
-    if (score >= 10) return "0 0 30px rgba(45, 212, 191, 0.3)";
-    return "0 0 30px rgba(248, 113, 113, 0.3)";
-  };
-
-  const color = getColor();
 
   return (
-    <div
-      className="relative flex items-center justify-center"
-      style={{ width: size, height: size, filter: `drop-shadow(${getGlow()})` }}
-    >
-      <svg width={size} height={size} className="-rotate-90">
-        {/* Background ring */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="#131816"
-          strokeWidth={strokeWidth}
-        />
-        {/* Progress ring */}
-        <motion.circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={color}
-          strokeWidth={strokeWidth}
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          initial={{ strokeDashoffset: circumference }}
-          animate={{
-            strokeDashoffset: circumference - circumference * ratio,
-          }}
-          transition={{ duration: 1, ease: "easeOut" }}
-        />
-      </svg>
-
-      {/* Center text */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <motion.span
-          className="text-xl font-serif font-medium"
-          style={{ color }}
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-        >
-          {score}/{total}
-        </motion.span>
-        <span className="text-text-tertiary text-[10px] mt-0.5">
-          {status === "running" ? "testing..." : "attacks blocked"}
+    <div className="flex flex-col items-center">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="flex items-baseline gap-1"
+      >
+        <span className={`font-serif text-7xl md:text-8xl font-normal ${getColor()}`}>
+          {score}
         </span>
-      </div>
+        <span className="text-text-tertiary text-2xl font-serif">/{total}</span>
+      </motion.div>
+      <span className="text-text-tertiary text-sm mt-2">
+        {status === "running" ? "testing..." : "attacks blocked"}
+      </span>
     </div>
   );
 }

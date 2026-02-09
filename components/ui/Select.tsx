@@ -44,7 +44,7 @@ export default function Select({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className={clsx(
-            "w-full appearance-none bg-card border border-transparent rounded-lg",
+            "w-full appearance-none bg-card border border-border rounded-lg",
             "text-text-primary",
             "focus:outline-none focus:border-accent/40 focus:ring-1 focus:ring-accent/20",
             "transition-colors duration-200 cursor-pointer",

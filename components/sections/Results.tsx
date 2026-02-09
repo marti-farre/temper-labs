@@ -17,6 +17,7 @@ import ScoreRing from "@/components/ui/ScoreRing";
 import AttackResultComponent from "@/components/ui/AttackResult";
 import { AttackResult } from "@/hooks/useTest";
 import { CATEGORIES, attacks } from "@/lib/attacks";
+import { CategoryInfo } from "@/lib/attacks";
 
 type Filter = "all" | "blocked" | "warning" | "failed";
 
@@ -30,6 +31,12 @@ interface ResultsProps {
   onExpandAll: () => void;
   onCollapseAll: () => void;
   onReset: () => void;
+  totalAttacks?: number;
+  categories?: CategoryInfo[];
+  attacksData?: { id: number; prompt: string }[];
+  externalRecommendations?: { text: string; category: string }[];
+  reportTitle?: string;
+  recommendationsTitle?: string;
 }
 
 export default function Results({
@@ -42,13 +49,21 @@ export default function Results({
   onExpandAll,
   onCollapseAll,
   onReset,
+  totalAttacks,
+  categories,
+  attacksData,
+  externalRecommendations,
+  reportTitle,
+  recommendationsTitle,
 }: ResultsProps) {
   const [filter, setFilter] = useState<Filter>("all");
   const [copied, setCopied] = useState(false);
   const [copiedRec, setCopiedRec] = useState<number | null>(null);
   const [showAllAttacks, setShowAllAttacks] = useState(false);
 
-  const total = attacks.length;
+  const effectiveCategories = categories ?? CATEGORIES;
+  const effectiveAttacksData = attacksData ?? attacks;
+  const total = totalAttacks ?? attacks.length;
 
   const blocked = useMemo(
     () => results.filter((r) => r.verdict === "BLOCKED").length,
@@ -72,7 +87,7 @@ export default function Results({
 
   const categoryStats = useMemo(() => {
     const stats = new Map<string, { blocked: number; warning: number; failed: number; total: number }>();
-    for (const cat of CATEGORIES) {
+    for (const cat of effectiveCategories) {
       stats.set(cat.name, { blocked: 0, warning: 0, failed: 0, total: cat.count });
     }
     for (const r of results) {
@@ -83,7 +98,7 @@ export default function Results({
       else entry.failed++;
     }
     return stats;
-  }, [results]);
+  }, [results, effectiveCategories]);
 
   const vulnerableCategories = useMemo(() => {
     const cats = new Set(
@@ -97,7 +112,7 @@ export default function Results({
     [results]
   );
 
-  const recommendations = useMemo(() => {
+  const internalRecommendations = useMemo(() => {
     const recs: { text: string; category: string }[] = [];
 
     if (vulnerableCategories.includes("Prompt Leaking")) {
@@ -152,15 +167,19 @@ export default function Results({
     return recs;
   }, [vulnerableCategories, hasWarnings]);
 
+  const recommendations = externalRecommendations ?? internalRecommendations;
+
   const getVerdict = () => {
-    if (blocked > 19) return "Impressive. Your prompt held up.";
-    if (blocked >= 10) return "Not bad, but there\u2019s work to do.";
+    const ratio = total > 0 ? blocked / total : 0;
+    if (ratio > 0.8) return "Impressive. Your defenses held up.";
+    if (ratio >= 0.4) return "Not bad, but there\u2019s work to do.";
     return "Ouch. Let\u2019s fix this.";
   };
 
   const copyReport = () => {
+    const title = reportTitle ?? "Temper Security Report";
     const lines = [
-      `# TemperLLM Security Report`,
+      `# ${title}`,
       ``,
       `Score: ${blocked}/${total} attacks blocked`,
       `Warnings: ${warnings} | Failed: ${failed}`,
@@ -187,6 +206,8 @@ export default function Results({
     setCopiedRec(index);
     setTimeout(() => setCopiedRec(null), 2000);
   };
+
+  const recTitle = recommendationsTitle ?? "Strengthen your prompt";
 
   if (status === "idle") return null;
 
@@ -240,7 +261,7 @@ export default function Results({
               {/* Progress bar during running */}
               {status === "running" && (
                 <div className="w-full max-w-xs mt-6">
-                  <div className="h-1 bg-card rounded-full overflow-hidden">
+                  <div className="h-1 bg-bg-subtle rounded-full overflow-hidden">
                     <motion.div
                       className="h-full bg-accent rounded-full"
                       initial={{ width: 0 }}
@@ -262,21 +283,21 @@ export default function Results({
                   className="flex items-center gap-4 mt-8"
                 >
                   <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-success/5">
-                    <div className="w-2 h-2 rounded-full bg-success shadow-glow-green" />
+                    <div className="w-2 h-2 rounded-full bg-success" />
                     <span className="text-success text-sm font-mono font-medium">
                       {blocked}
                     </span>
                     <span className="text-text-tertiary text-xs">blocked</span>
                   </div>
                   <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-warning/5">
-                    <div className="w-2 h-2 rounded-full bg-warning shadow-glow-amber" />
+                    <div className="w-2 h-2 rounded-full bg-warning" />
                     <span className="text-warning text-sm font-mono font-medium">
                       {warnings}
                     </span>
                     <span className="text-text-tertiary text-xs">warnings</span>
                   </div>
                   <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-fail/5">
-                    <div className="w-2 h-2 rounded-full bg-fail shadow-glow-red" />
+                    <div className="w-2 h-2 rounded-full bg-fail" />
                     <span className="text-fail text-sm font-mono font-medium">
                       {failed}
                     </span>
@@ -298,7 +319,7 @@ export default function Results({
                   Results by category
                 </p>
                 <div className="space-y-3">
-                  {CATEGORIES.map((cat) => {
+                  {effectiveCategories.map((cat) => {
                     const stats = categoryStats.get(cat.name);
                     if (!stats) return null;
                     const catTotal = stats.total;
@@ -307,7 +328,7 @@ export default function Results({
                         <span className="text-text-secondary text-xs w-32 truncate flex-shrink-0">
                           {cat.name}
                         </span>
-                        <div className="flex-1 h-2 bg-card rounded-full overflow-hidden flex">
+                        <div className="flex-1 h-2 bg-bg-subtle rounded-full overflow-hidden flex">
                           {stats.blocked > 0 && (
                             <div
                               className="h-full bg-success rounded-l-full"
@@ -374,7 +395,7 @@ export default function Results({
                           onClick={() => setFilter("all")}
                           className={`text-xs px-3 py-1 rounded-full transition-colors ${
                             filter === "all"
-                              ? "bg-card text-text-primary"
+                              ? "bg-bg-subtle text-text-primary"
                               : "text-text-tertiary hover:text-text-secondary"
                           }`}
                         >
@@ -434,7 +455,7 @@ export default function Results({
                           reason={result.reason}
                           response={result.response}
                           attackPrompt={
-                            attacks.find((a) => a.id === result.id)?.prompt
+                            effectiveAttacksData.find((a) => a.id === result.id)?.prompt
                           }
                           expanded={expandedResults.has(result.index)}
                           onToggle={() => onToggleResult(result.index)}
@@ -457,7 +478,7 @@ export default function Results({
                       <ShieldCheck className="w-5 h-5 text-warning flex-shrink-0" />
                       <div>
                         <h3 className="text-text-primary font-medium text-sm">
-                          Strengthen your prompt
+                          {recTitle}
                         </h3>
                         <p className="text-text-tertiary text-xs">
                           Add these lines based on {failed + warnings} vulnerabilities
@@ -468,7 +489,7 @@ export default function Results({
                       {recommendations.map((rec, i) => (
                         <div
                           key={i}
-                          className="group relative flex items-start gap-3 p-4 rounded-lg bg-card/50 border border-transparent hover:border-white/5 transition-all"
+                          className="group relative flex items-start gap-3 p-4 rounded-lg bg-card border border-border hover:border-border-hover transition-all"
                         >
                           <p className="text-text-secondary text-sm pr-8 flex-1">
                             &ldquo;{rec.text}&rdquo;

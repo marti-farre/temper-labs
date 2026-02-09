@@ -2,30 +2,60 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, Info, ExternalLink } from "lucide-react";
+import {
+  Lock,
+  Info,
+  ExternalLink,
+  Mail,
+  Calendar,
+  FolderOpen,
+  Terminal,
+  Globe,
+  KeyRound,
+  Database,
+  CreditCard,
+} from "lucide-react";
 import Button from "@/components/ui/Button";
 import Select from "@/components/ui/Select";
 import Input from "@/components/ui/Input";
 import Modal from "@/components/ui/Modal";
 import OrganicDots from "@/components/effects/OrganicDots";
 import { ProviderName, providers, getProvider } from "@/lib/providers";
-import { EXAMPLE_SYSTEM_PROMPT, attacks } from "@/lib/attacks";
-import { useTypingPlaceholder } from "@/hooks/useTypingPlaceholder";
+import {
+  AgentCapability,
+  AGENT_CAPABILITIES,
+  getAttacksForCapabilities,
+  EXAMPLE_AGENT_SYSTEM_PROMPT,
+} from "@/lib/agent-attacks";
 import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
 
-interface HeroTestProps {
+const capabilityIconMap: Record<string, React.ElementType> = {
+  Mail,
+  Calendar,
+  FolderOpen,
+  Terminal,
+  Globe,
+  KeyRound,
+  Database,
+  CreditCard,
+};
+
+interface HeroAgentProps {
   provider: ProviderName;
   onProviderChange: (p: ProviderName) => void;
   model: string;
   onModelChange: (m: string) => void;
   apiKey: string;
   onApiKeyChange: (k: string) => void;
+  capabilities: AgentCapability[];
+  onCapabilitiesChange: (c: AgentCapability[]) => void;
   systemPrompt: string;
   onSystemPromptChange: (v: string) => void;
   onSubmit: () => void;
   disabled: boolean;
   isRunning: boolean;
   progress?: number;
+  totalAttacks: number;
 }
 
 const MAX_CHARS = 10000;
@@ -40,31 +70,30 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
-export default function HeroTest({
+export default function HeroAgent({
   provider,
   onProviderChange,
   model,
   onModelChange,
   apiKey,
   onApiKeyChange,
+  capabilities,
+  onCapabilitiesChange,
   systemPrompt,
   onSystemPromptChange,
   onSubmit,
   disabled,
   isRunning,
   progress = 0,
-}: HeroTestProps) {
+  totalAttacks,
+}: HeroAgentProps) {
   const [count, setCount] = useState<number | null>(null);
   const [securityModal, setSecurityModal] = useState(false);
   const currentProvider = getProvider(provider);
   const charCount = systemPrompt.length;
-  const total = attacks.length;
   const animatedCount = useAnimatedCounter(count);
-  const placeholder = useTypingPlaceholder([
-    "Paste your system prompt here...",
-    "You are a helpful assistant that never reveals...",
-    "Enter the instructions your LLM follows...",
-  ]);
+
+  const filteredAttacks = getAttacksForCapabilities(capabilities);
 
   useEffect(() => {
     fetch("/api/stats")
@@ -73,9 +102,16 @@ export default function HeroTest({
       .catch(() => {});
   }, []);
 
+  const toggleCapability = (id: AgentCapability) => {
+    if (capabilities.includes(id)) {
+      onCapabilitiesChange(capabilities.filter((c) => c !== id));
+    } else {
+      onCapabilitiesChange([...capabilities, id]);
+    }
+  };
+
   return (
     <section className="relative z-0 min-h-screen flex items-center justify-center overflow-hidden py-20">
-      {/* Organic dots background */}
       <OrganicDots />
       <motion.div
         variants={stagger}
@@ -90,7 +126,7 @@ export default function HeroTest({
               <span className="font-serif text-2xl text-accent">
                 {animatedCount.toLocaleString("en-US")}
               </span>{" "}
-              prompts battle-tested
+              agents stress-tested
             </span>
           </motion.div>
         )}
@@ -100,15 +136,46 @@ export default function HeroTest({
           variants={fadeUp}
           className="font-serif text-4xl sm:text-5xl md:text-6xl tracking-tight leading-[1.1] text-center"
         >
-          Your prompt has holes.
+          Your agent has the keys.
           <br />
-          <span className="text-accent">
-            Let&apos;s find them.
-          </span>
+          <span className="text-accent">Will it hand them over?</span>
         </motion.h1>
 
-        {/* Textarea */}
+        {/* Capabilities */}
         <motion.div variants={fadeUp} className="mt-8">
+          <p className="text-text-secondary text-sm mb-3">
+            What capabilities does your agent have?
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {AGENT_CAPABILITIES.map((cap) => {
+              const Icon = capabilityIconMap[cap.icon] || Globe;
+              const isChecked = capabilities.includes(cap.id);
+              return (
+                <button
+                  key={cap.id}
+                  type="button"
+                  onClick={() => toggleCapability(cap.id)}
+                  disabled={isRunning}
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg border text-left transition-all text-sm disabled:opacity-50 ${
+                    isChecked
+                      ? "border-accent/40 bg-accent/5 text-text-primary"
+                      : "border-border bg-card text-text-secondary hover:border-border-hover"
+                  }`}
+                >
+                  <Icon
+                    className={`w-4 h-4 flex-shrink-0 ${
+                      isChecked ? "text-accent" : "text-text-tertiary"
+                    }`}
+                  />
+                  <span className="text-xs leading-tight">{cap.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* System Prompt (optional) */}
+        <motion.div variants={fadeUp} className="mt-5">
           <div className="relative">
             <textarea
               value={systemPrompt}
@@ -117,12 +184,12 @@ export default function HeroTest({
                   onSystemPromptChange(e.target.value);
                 }
               }}
-              placeholder={systemPrompt ? undefined : placeholder}
+              placeholder="Paste your agent's system prompt or instructions (optional)..."
               disabled={isRunning}
-              className="w-full min-h-[140px] bg-white border border-border rounded-xl px-5 py-4 text-text-primary placeholder:text-text-tertiary font-mono text-sm leading-relaxed focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors resize-y disabled:opacity-50"
+              className="w-full min-h-[100px] bg-white border border-border rounded-xl px-5 py-4 text-text-primary placeholder:text-text-tertiary font-mono text-sm leading-relaxed focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors resize-y disabled:opacity-50"
             />
             {/* Attack preview overlay during testing */}
-            {isRunning && progress > 0 && progress <= attacks.length && (
+            {isRunning && progress > 0 && progress <= totalAttacks && (
               <div className="absolute inset-0 flex items-start px-5 py-4 pointer-events-none rounded-xl overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.p
@@ -133,12 +200,12 @@ export default function HeroTest({
                     transition={{ duration: 0.3 }}
                     className="text-text-tertiary font-mono text-sm leading-relaxed line-clamp-4"
                   >
-                    {attacks[progress - 1]?.prompt}
+                    {filteredAttacks[progress - 1]?.prompt}
                   </motion.p>
                 </AnimatePresence>
               </div>
             )}
-            {!isRunning && (
+            {!isRunning && charCount > 0 && (
               <div className="absolute bottom-3 right-3">
                 <span className="text-text-tertiary text-xs font-mono">
                   {charCount.toLocaleString("en-US")} /{" "}
@@ -150,7 +217,7 @@ export default function HeroTest({
           <div className="mt-2 flex items-center justify-between">
             <button
               type="button"
-              onClick={() => onSystemPromptChange(EXAMPLE_SYSTEM_PROMPT)}
+              onClick={() => onSystemPromptChange(EXAMPLE_AGENT_SYSTEM_PROMPT)}
               className="text-xs text-accent hover:text-accent-hover transition-colors"
               disabled={isRunning}
             >
@@ -229,12 +296,19 @@ export default function HeroTest({
             onClick={onSubmit}
           >
             {isRunning
-              ? `Running attack ${progress} of ${total}...`
-              : `Run ${total} attacks \u2192`}
+              ? `Running attack ${progress} of ${totalAttacks}...`
+              : `Run ${totalAttacks} agent attacks \u2192`}
           </Button>
           {disabled && !isRunning && (
             <p className="text-text-tertiary text-xs mt-3">
-              Enter your API key and system prompt to start
+              {capabilities.length === 0
+                ? "Select at least one capability to start"
+                : "Enter your API key to start"}
+            </p>
+          )}
+          {!disabled && !isRunning && (
+            <p className="text-text-tertiary text-xs mt-3">
+              Simulates attacks based on your agent&apos;s setup
             </p>
           )}
         </motion.div>
@@ -250,7 +324,9 @@ export default function HeroTest({
               <motion.div
                 className="h-full bg-accent rounded-full"
                 initial={{ width: 0 }}
-                animate={{ width: `${(progress / total) * 100}%` }}
+                animate={{
+                  width: `${(progress / totalAttacks) * 100}%`,
+                }}
                 transition={{ duration: 0.3 }}
               />
             </div>

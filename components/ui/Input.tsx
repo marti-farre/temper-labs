@@ -36,7 +36,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             type={masked && !showValue ? "password" : type || "text"}
             className={clsx(
-              "w-full bg-card border border-transparent rounded-lg",
+              "w-full bg-card border border-border rounded-lg",
               "text-text-primary placeholder:text-text-tertiary",
               "focus:outline-none focus:border-accent/40 focus:ring-1 focus:ring-accent/20",
               "transition-colors duration-200 font-mono",

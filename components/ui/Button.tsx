@@ -11,7 +11,6 @@ type ButtonSize = "sm" | "md" | "lg";
 interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
   variant?: ButtonVariant;
   size?: ButtonSize;
-  glow?: boolean;
   loading?: boolean;
   icon?: React.ReactNode;
   children: React.ReactNode;
@@ -19,11 +18,11 @@ interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-accent text-white hover:bg-accent-hover border border-accent/50",
+    "bg-accent text-white hover:bg-accent-hover border border-accent",
   secondary:
-    "bg-transparent text-text-primary border border-border hover:border-text-tertiary hover:bg-card",
+    "bg-white text-text-primary border border-border hover:border-border-hover hover:bg-bg-subtle",
   ghost:
-    "bg-transparent text-text-secondary hover:text-text-primary border border-transparent",
+    "bg-transparent text-text-secondary hover:text-text-primary hover:bg-bg-subtle border border-transparent",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -37,7 +36,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     {
       variant = "primary",
       size = "md",
-      glow = false,
       loading = false,
       icon,
       children,
@@ -57,7 +55,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           "disabled:opacity-50 disabled:cursor-not-allowed",
           variantStyles[variant],
           sizeStyles[size],
-          glow && variant === "primary" && "shadow-glow-accent hover:shadow-glow-accent-lg",
           className
         )}
         disabled={disabled || loading}

@@ -58,12 +58,12 @@ export default function AttackResult({
           ? { duration: 0.3 }
           : { type: "spring", stiffness: 400, damping: 15 }
       }
-      className="rounded-lg overflow-hidden bg-card/50"
+      className="rounded-lg overflow-hidden bg-card border border-border"
     >
       {/* Header - always visible */}
       <button
         onClick={onToggle}
-        className="flex items-center gap-3 w-full p-4 text-left hover:bg-card transition-colors"
+        className="flex items-center gap-3 w-full p-4 text-left hover:bg-card-hover transition-colors"
       >
         {/* Status indicator */}
         <div
@@ -113,7 +113,7 @@ export default function AttackResult({
             transition={{ duration: 0.2, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-4 space-y-3 border-t border-white/5 pt-3">
+            <div className="px-4 pb-4 space-y-3 border-t border-border pt-3">
               {/* Verdict */}
               <div>
                 <span className="text-xs text-text-tertiary uppercase tracking-wider">
@@ -127,7 +127,7 @@ export default function AttackResult({
                 <span className="text-xs text-text-tertiary uppercase tracking-wider">
                   Model Response
                 </span>
-                <pre className="mt-1 p-3 bg-bg rounded-lg text-xs text-text-secondary font-mono overflow-x-auto max-h-48 overflow-y-auto whitespace-pre-wrap">
+                <pre className="mt-1 p-3 bg-code rounded-lg text-xs text-text-secondary font-mono overflow-x-auto max-h-48 overflow-y-auto whitespace-pre-wrap">
                   {response}
                 </pre>
               </div>
