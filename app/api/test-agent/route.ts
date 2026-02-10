@@ -4,8 +4,8 @@ import {
   AGENT_CAPABILITIES,
   getAttacksForCapabilities,
 } from "@/lib/agent-attacks";
-import { chatWithProvider, ProviderName, isValidModel } from "@/lib/providers";
-import { judgeAgent } from "@/lib/agent-judge";
+import { chatWithProvider, chatFree, ProviderName, isValidModel } from "@/lib/providers";
+import { judgeAgent, judgeAgentFree } from "@/lib/agent-judge";
 import { saveAgentTest } from "@/lib/stats";
 
 // In-memory rate limiting
@@ -39,9 +39,10 @@ export async function POST(request: NextRequest) {
   }
 
   let body: {
-    provider: ProviderName;
-    model: string;
-    apiKey: string;
+    mode?: "free" | "byok";
+    provider?: ProviderName;
+    model?: string;
+    apiKey?: string;
     capabilities: AgentCapability[];
     systemPrompt?: string;
   };
@@ -55,24 +56,33 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { provider, model, apiKey, capabilities, systemPrompt } = body;
+  const { mode = "byok", provider, model, apiKey, capabilities, systemPrompt } = body;
 
-  if (!provider || !model || !apiKey || !capabilities || capabilities.length === 0) {
+  if (!capabilities || capabilities.length === 0) {
     return NextResponse.json(
-      { error: "Missing required fields: provider, model, apiKey, capabilities" },
+      { error: "Missing required field: capabilities" },
       { status: 400 }
     );
   }
 
-  if (!["openai", "anthropic", "mistral"].includes(provider)) {
-    return NextResponse.json({ error: "Invalid provider" }, { status: 400 });
-  }
+  if (mode === "byok") {
+    if (!provider || !model || !apiKey) {
+      return NextResponse.json(
+        { error: "Missing required fields: provider, model, apiKey" },
+        { status: 400 }
+      );
+    }
 
-  if (!isValidModel(provider, model)) {
-    return NextResponse.json(
-      { error: "Invalid model for the selected provider" },
-      { status: 400 }
-    );
+    if (!["openai", "anthropic", "mistral"].includes(provider)) {
+      return NextResponse.json({ error: "Invalid provider" }, { status: 400 });
+    }
+
+    if (!isValidModel(provider, model)) {
+      return NextResponse.json(
+        { error: "Invalid model for the selected provider" },
+        { status: 400 }
+      );
+    }
   }
 
   const validCapabilities = capabilities.filter((c) =>
@@ -104,27 +114,19 @@ export async function POST(request: NextRequest) {
       let warnings = 0;
       const failedIds: number[] = [];
 
+      const isFree = mode === "free";
+
       for (let i = 0; i < attacks.length; i++) {
         const attack = attacks[i];
 
         try {
-          const response = await chatWithProvider(
-            provider,
-            model,
-            apiKey,
-            agentSystemPrompt,
-            attack.prompt
-          );
+          const response = isFree
+            ? await chatFree(agentSystemPrompt, attack.prompt)
+            : await chatWithProvider(provider!, model!, apiKey!, agentSystemPrompt, attack.prompt);
 
-          const verdict = await judgeAgent(
-            provider,
-            model,
-            apiKey,
-            validCapabilities,
-            systemPrompt,
-            attack.prompt,
-            response
-          );
+          const verdict = isFree
+            ? await judgeAgentFree(validCapabilities, systemPrompt, attack.prompt, response)
+            : await judgeAgent(provider!, model!, apiKey!, validCapabilities, systemPrompt, attack.prompt, response);
 
           if (verdict.verdict === "BLOCKED") score++;
           else if (verdict.verdict === "WARNING") warnings++;
@@ -171,8 +173,8 @@ export async function POST(request: NextRequest) {
         const failed = attacks.length - score - warnings;
         await saveAgentTest({
           capabilities: validCapabilities,
-          provider,
-          model,
+          provider: isFree ? "groq" : provider!,
+          model: isFree ? "llama3-8b-8192" : model!,
           totalAttacks: attacks.length,
           blocked: score,
           warnings,

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { attacks } from "@/lib/attacks";
-import { chatWithProvider, ProviderName, isValidModel } from "@/lib/providers";
-import { judge } from "@/lib/judge";
+import { chatWithProvider, chatFree, ProviderName, isValidModel } from "@/lib/providers";
+import { judge, judgeFree } from "@/lib/judge";
 import { savePromptTest } from "@/lib/stats";
 
 // In-memory rate limiting
@@ -32,9 +32,10 @@ export async function POST(request: NextRequest) {
   }
 
   let body: {
-    provider: ProviderName;
-    model: string;
-    apiKey: string;
+    mode?: "free" | "byok";
+    provider?: ProviderName;
+    model?: string;
+    apiKey?: string;
     systemPrompt: string;
   };
 
@@ -47,27 +48,36 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { provider, model, apiKey, systemPrompt } = body;
+  const { mode = "byok", provider, model, apiKey, systemPrompt } = body;
 
-  if (!provider || !model || !apiKey || !systemPrompt) {
+  if (!systemPrompt) {
     return NextResponse.json(
-      { error: "Missing required fields: provider, model, apiKey, systemPrompt" },
+      { error: "Missing required field: systemPrompt" },
       { status: 400 }
     );
   }
 
-  if (!["openai", "anthropic", "mistral"].includes(provider)) {
-    return NextResponse.json(
-      { error: "Invalid provider" },
-      { status: 400 }
-    );
-  }
+  if (mode === "byok") {
+    if (!provider || !model || !apiKey) {
+      return NextResponse.json(
+        { error: "Missing required fields: provider, model, apiKey" },
+        { status: 400 }
+      );
+    }
 
-  if (!isValidModel(provider, model)) {
-    return NextResponse.json(
-      { error: "Invalid model for the selected provider" },
-      { status: 400 }
-    );
+    if (!["openai", "anthropic", "mistral"].includes(provider)) {
+      return NextResponse.json(
+        { error: "Invalid provider" },
+        { status: 400 }
+      );
+    }
+
+    if (!isValidModel(provider, model)) {
+      return NextResponse.json(
+        { error: "Invalid model for the selected provider" },
+        { status: 400 }
+      );
+    }
   }
 
   const stream = new ReadableStream({
@@ -77,28 +87,21 @@ export async function POST(request: NextRequest) {
       let warnings = 0;
       const failedIds: number[] = [];
 
+      const isFree = mode === "free";
+
       for (let i = 0; i < attacks.length; i++) {
         const attack = attacks[i];
 
         try {
           // Run the attack
-          const response = await chatWithProvider(
-            provider,
-            model,
-            apiKey,
-            systemPrompt,
-            attack.prompt
-          );
+          const response = isFree
+            ? await chatFree(systemPrompt, attack.prompt)
+            : await chatWithProvider(provider!, model!, apiKey!, systemPrompt, attack.prompt);
 
           // Judge the response
-          const verdict = await judge(
-            provider,
-            model,
-            apiKey,
-            systemPrompt,
-            attack.prompt,
-            response
-          );
+          const verdict = isFree
+            ? await judgeFree(systemPrompt, attack.prompt, response)
+            : await judge(provider!, model!, apiKey!, systemPrompt, attack.prompt, response);
 
           if (verdict.verdict === "BLOCKED") score++;
           else if (verdict.verdict === "WARNING") warnings++;
@@ -149,8 +152,8 @@ export async function POST(request: NextRequest) {
       try {
         const failed = attacks.length - score - warnings;
         await savePromptTest({
-          provider,
-          model,
+          provider: isFree ? "groq" : provider!,
+          model: isFree ? "llama3-8b-8192" : model!,
           totalAttacks: attacks.length,
           blocked: score,
           warnings,

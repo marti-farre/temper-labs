@@ -95,6 +95,7 @@ const initialState: AgentTestState = {
 };
 
 export interface AgentTestConfig {
+  mode: "free" | "byok";
   provider: ProviderName;
   model: string;
   apiKey: string;

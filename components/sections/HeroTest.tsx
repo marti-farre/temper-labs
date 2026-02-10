@@ -1,19 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, Info, ExternalLink } from "lucide-react";
 import Button from "@/components/ui/Button";
-import Select from "@/components/ui/Select";
-import Input from "@/components/ui/Input";
-import Modal from "@/components/ui/Modal";
+import ModelSelector, { ModelMode } from "@/components/ui/ModelSelector";
 import OrganicDots from "@/components/effects/OrganicDots";
-import { ProviderName, providers, getProvider } from "@/lib/providers";
+import { ProviderName } from "@/lib/providers";
 import { EXAMPLE_SYSTEM_PROMPT, attacks } from "@/lib/attacks";
 import { useTypingPlaceholder } from "@/hooks/useTypingPlaceholder";
 import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
 
 interface HeroTestProps {
+  modelMode: ModelMode;
+  onModelModeChange: (m: ModelMode) => void;
   provider: ProviderName;
   onProviderChange: (p: ProviderName) => void;
   model: string;
@@ -42,6 +40,8 @@ const fadeUp = {
 };
 
 export default function HeroTest({
+  modelMode,
+  onModelModeChange,
   provider,
   onProviderChange,
   model,
@@ -56,8 +56,6 @@ export default function HeroTest({
   progress = 0,
   statsCount,
 }: HeroTestProps) {
-  const [securityModal, setSecurityModal] = useState(false);
-  const currentProvider = getProvider(provider);
   const charCount = systemPrompt.length;
   const total = attacks.length;
   const animatedCount = useAnimatedCounter(statsCount);
@@ -69,7 +67,6 @@ export default function HeroTest({
 
   return (
     <section className="relative z-0 min-h-screen flex items-center justify-center overflow-hidden py-20">
-      {/* Organic dots background */}
       <OrganicDots />
       <motion.div
         variants={stagger}
@@ -101,9 +98,7 @@ export default function HeroTest({
         >
           Your prompt has holes.
           <br />
-          <span className="text-accent">
-            Let&apos;s find them.
-          </span>
+          <span className="text-accent">Let&apos;s find them.</span>
         </motion.h1>
 
         {/* Textarea */}
@@ -120,7 +115,6 @@ export default function HeroTest({
               disabled={isRunning}
               className="w-full min-h-[140px] bg-white border border-border rounded-xl px-5 py-4 text-text-primary placeholder:text-text-tertiary font-mono text-sm leading-relaxed focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors resize-y disabled:opacity-50"
             />
-            {/* Attack preview overlay during testing */}
             {isRunning && progress > 0 && progress <= attacks.length && (
               <div className="absolute inset-0 flex items-start px-5 py-4 pointer-events-none rounded-xl overflow-hidden">
                 <AnimatePresence mode="wait">
@@ -158,65 +152,19 @@ export default function HeroTest({
           </div>
         </motion.div>
 
-        {/* Inline config row */}
+        {/* Model Selector */}
         <motion.div variants={fadeUp} className="mt-5">
-          <div className="flex flex-col sm:flex-row items-stretch gap-3">
-            <Select
-              options={providers.map((p) => ({
-                value: p.id,
-                label: p.name,
-              }))}
-              value={provider}
-              onChange={(v) => {
-                const p = v as ProviderName;
-                onProviderChange(p);
-                const first = getProvider(p).models[0];
-                if (first) onModelChange(first.id);
-              }}
-              compact
-              className="sm:w-36"
-            />
-            <Select
-              options={currentProvider.models.map((m) => ({
-                value: m.id,
-                label: m.name,
-              }))}
-              value={model}
-              onChange={onModelChange}
-              compact
-              className="sm:w-44"
-            />
-            <div className="flex-1 flex items-center gap-2">
-              <Input
-                masked
-                icon={<Lock className="w-3.5 h-3.5" />}
-                placeholder={currentProvider.keyPlaceholder}
-                value={apiKey}
-                onChange={(e) => onApiKeyChange(e.target.value)}
-                disabled={isRunning}
-                compact
-              />
-              <button
-                type="button"
-                onClick={() => setSecurityModal(true)}
-                className="flex-shrink-0 p-2 text-text-tertiary hover:text-text-secondary transition-colors"
-                title="How we protect your key"
-              >
-                <Info className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-          <div className="mt-2 flex items-center justify-end">
-            <a
-              href={currentProvider.docsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-accent/70 hover:text-accent transition-colors"
-            >
-              Get an API key
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          </div>
+          <ModelSelector
+            mode={modelMode}
+            onModeChange={onModelModeChange}
+            provider={provider}
+            onProviderChange={onProviderChange}
+            model={model}
+            onModelChange={onModelChange}
+            apiKey={apiKey}
+            onApiKeyChange={onApiKeyChange}
+            isRunning={isRunning}
+          />
         </motion.div>
 
         {/* CTA */}
@@ -233,12 +181,16 @@ export default function HeroTest({
           </Button>
           {disabled && !isRunning && (
             <p className="text-text-tertiary text-xs mt-3">
-              Enter your API key and system prompt to start
+              {!systemPrompt.trim()
+                ? "Enter your system prompt to start"
+                : modelMode === "byok" && !apiKey.trim()
+                ? "Enter your API key to start"
+                : ""}
             </p>
           )}
         </motion.div>
 
-        {/* Progress bar during test */}
+        {/* Progress bar */}
         {isRunning && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -261,62 +213,9 @@ export default function HeroTest({
           variants={fadeUp}
           className="mt-6 text-center text-text-tertiary text-xs"
         >
-          Works with OpenAI &middot; Anthropic &middot; Mistral
+          Free model included &middot; OpenAI &middot; Anthropic &middot; Mistral
         </motion.p>
       </motion.div>
-
-      {/* Security Modal */}
-      <Modal
-        open={securityModal}
-        onClose={() => setSecurityModal(false)}
-        title="Your API key is safe"
-      >
-        <div className="space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Lock className="w-4 h-4 text-success" />
-            </div>
-            <div>
-              <p className="text-text-primary text-sm font-medium">
-                Stays in your browser
-              </p>
-              <p className="text-text-tertiary text-xs mt-0.5">
-                Your key is sent directly to {currentProvider.name}&apos;s API
-                from your browser. It passes through our server only to avoid
-                CORS restrictions.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Lock className="w-4 h-4 text-success" />
-            </div>
-            <div>
-              <p className="text-text-primary text-sm font-medium">
-                Never stored or logged
-              </p>
-              <p className="text-text-tertiary text-xs mt-0.5">
-                We never store, log, or have access to your API key. It exists
-                only in memory during the test.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Lock className="w-4 h-4 text-success" />
-            </div>
-            <div>
-              <p className="text-text-primary text-sm font-medium">
-                Open source
-              </p>
-              <p className="text-text-tertiary text-xs mt-0.5">
-                Our entire codebase is open source. Verify our security
-                practices yourself.
-              </p>
-            </div>
-          </div>
-        </div>
-      </Modal>
     </section>
   );
 }

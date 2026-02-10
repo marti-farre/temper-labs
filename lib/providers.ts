@@ -141,3 +141,27 @@ async function chatMistral(
     ? choice.message.content
     : "";
 }
+
+// Free tier: Groq with server-side API key
+export const FREE_MODEL = "llama3-8b-8192";
+export const FREE_MODEL_NAME = "Llama 3 8B";
+
+export async function chatFree(
+  systemPrompt: string,
+  userMessage: string
+): Promise<string> {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) throw new Error("Free model not configured (missing GROQ_API_KEY)");
+  const { default: Groq } = await import("groq-sdk");
+  const client = new Groq({ apiKey });
+  const response = await client.chat.completions.create({
+    model: FREE_MODEL,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userMessage },
+    ],
+    max_tokens: 1024,
+    temperature: 0.2,
+  });
+  return response.choices[0]?.message?.content || "";
+}

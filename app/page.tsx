@@ -12,6 +12,7 @@ import {
   agentAttacks,
 } from "@/lib/agent-attacks";
 import { getAgentRecommendations } from "@/lib/agent-recommendations";
+import { ModelMode } from "@/components/ui/ModelSelector";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -26,6 +27,10 @@ type TabMode = "agent" | "prompt";
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabMode>("agent");
   const [statsCount, setStatsCount] = useState<number | null>(null);
+  const [modelMode, setModelMode] = useLocalStorage<ModelMode>(
+    "temper-model-mode",
+    "free"
+  );
 
   const fetchStats = () => {
     fetch("/api/stats")
@@ -66,12 +71,19 @@ export default function Home() {
 
   const handleRunTest = () => {
     hasScrolledToResults.current = false;
-    test.runTest({ provider, model, apiKey, systemPrompt });
+    test.runTest({
+      mode: modelMode,
+      provider,
+      model,
+      apiKey,
+      systemPrompt,
+    });
   };
 
   const handleRunAgentTest = () => {
     hasScrolledToResults.current = false;
     agentTest.runTest({
+      mode: modelMode,
       provider,
       model,
       apiKey,
@@ -79,6 +91,15 @@ export default function Home() {
       systemPrompt: agentSystemPrompt || undefined,
     });
   };
+
+  // Disabled logic: free mode only needs capabilities/prompt, BYOK also needs apiKey
+  const agentDisabled =
+    capabilities.length === 0 ||
+    (modelMode === "byok" && !apiKey.trim());
+
+  const promptDisabled =
+    !systemPrompt.trim() ||
+    (modelMode === "byok" && !apiKey.trim());
 
   // Agent attack filtering + categories
   const filteredAgentAttacks = useMemo(
@@ -175,6 +196,8 @@ export default function Home() {
         {/* Hero Section */}
         {activeTab === "agent" ? (
           <HeroAgent
+            modelMode={modelMode}
+            onModelModeChange={setModelMode}
             provider={provider}
             onProviderChange={handleProviderChange}
             model={model}
@@ -186,7 +209,7 @@ export default function Home() {
             systemPrompt={agentSystemPrompt}
             onSystemPromptChange={setAgentSystemPrompt}
             onSubmit={handleRunAgentTest}
-            disabled={!apiKey.trim() || capabilities.length === 0}
+            disabled={agentDisabled}
             isRunning={agentTest.status === "running"}
             progress={agentTest.progress}
             totalAttacks={filteredAgentAttacks.length}
@@ -194,6 +217,8 @@ export default function Home() {
           />
         ) : (
           <HeroTest
+            modelMode={modelMode}
+            onModelModeChange={setModelMode}
             provider={provider}
             onProviderChange={handleProviderChange}
             model={model}
@@ -203,7 +228,7 @@ export default function Home() {
             systemPrompt={systemPrompt}
             onSystemPromptChange={setSystemPrompt}
             onSubmit={handleRunTest}
-            disabled={!apiKey.trim() || !systemPrompt.trim()}
+            disabled={promptDisabled}
             isRunning={test.status === "running"}
             progress={test.progress}
             statsCount={statsCount}

@@ -92,6 +92,7 @@ const initialState: TestState = {
 };
 
 export interface TestConfig {
+  mode: "free" | "byok";
   provider: ProviderName;
   model: string;
   apiKey: string;
