@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Lock,
@@ -14,6 +14,7 @@ import {
   KeyRound,
   Database,
   CreditCard,
+  MessageCircle,
 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Select from "@/components/ui/Select";
@@ -38,6 +39,7 @@ const capabilityIconMap: Record<string, React.ElementType> = {
   KeyRound,
   Database,
   CreditCard,
+  MessageCircle,
 };
 
 interface HeroAgentProps {
@@ -56,6 +58,7 @@ interface HeroAgentProps {
   isRunning: boolean;
   progress?: number;
   totalAttacks: number;
+  statsCount: number | null;
 }
 
 const MAX_CHARS = 10000;
@@ -86,21 +89,14 @@ export default function HeroAgent({
   isRunning,
   progress = 0,
   totalAttacks,
+  statsCount,
 }: HeroAgentProps) {
-  const [count, setCount] = useState<number | null>(null);
   const [securityModal, setSecurityModal] = useState(false);
   const currentProvider = getProvider(provider);
   const charCount = systemPrompt.length;
-  const animatedCount = useAnimatedCounter(count);
+  const animatedCount = useAnimatedCounter(statsCount);
 
   const filteredAttacks = getAttacksForCapabilities(capabilities);
-
-  useEffect(() => {
-    fetch("/api/stats")
-      .then((r) => r.json())
-      .then((d) => setCount(d.count))
-      .catch(() => {});
-  }, []);
 
   const toggleCapability = (id: AgentCapability) => {
     if (capabilities.includes(id)) {
@@ -120,8 +116,13 @@ export default function HeroAgent({
         className="relative z-10 w-full max-w-4xl mx-auto px-6"
       >
         {/* Badge */}
-        {count !== null && count > 0 && (
-          <motion.div variants={fadeUp} className="text-center mb-6">
+        {statsCount !== null && statsCount > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="text-center mb-6"
+          >
             <span className="text-text-secondary text-base font-medium tracking-tight">
               <span className="font-serif text-2xl text-accent">
                 {animatedCount.toLocaleString("en-US")}
@@ -146,7 +147,7 @@ export default function HeroAgent({
           <p className="text-text-secondary text-sm mb-3">
             What capabilities does your agent have?
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {AGENT_CAPABILITIES.map((cap) => {
               const Icon = capabilityIconMap[cap.icon] || Globe;
               const isChecked = capabilities.includes(cap.id);
@@ -186,7 +187,7 @@ export default function HeroAgent({
               }}
               placeholder="Paste your agent's system prompt or instructions (optional)..."
               disabled={isRunning}
-              className="w-full min-h-[100px] bg-white border border-border rounded-xl px-5 py-4 text-text-primary placeholder:text-text-tertiary font-mono text-sm leading-relaxed focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors resize-y disabled:opacity-50"
+              className="w-full min-h-[160px] bg-white border border-border rounded-xl px-5 py-4 text-text-primary placeholder:text-text-tertiary font-mono text-sm leading-relaxed focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 transition-colors resize-y disabled:opacity-50"
             />
             {/* Attack preview overlay during testing */}
             {isRunning && progress > 0 && progress <= totalAttacks && (

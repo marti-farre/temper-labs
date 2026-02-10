@@ -25,6 +25,17 @@ type TabMode = "agent" | "prompt";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<TabMode>("agent");
+  const [statsCount, setStatsCount] = useState<number | null>(null);
+
+  const fetchStats = () => {
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then((d) => setStatsCount(d.count ?? 0))
+      .catch(() => setStatsCount(0));
+  };
+
+  // Fetch stats on mount
+  useEffect(() => { fetchStats(); }, []);
 
   const [provider, setProvider] = useLocalStorage<ProviderName>(
     "temper-provider",
@@ -105,10 +116,15 @@ export default function Home() {
     [agentVulnerableCategories, capabilities, agentHasWarnings]
   );
 
-  // Auto-scroll to results when first result arrives
+  // Refetch stats when a test completes
   const agentStatus = agentTest.status;
-  const agentResultsLen = agentTest.results.length;
   const promptStatus = test.status;
+  useEffect(() => {
+    if (agentStatus === "complete" || promptStatus === "complete") fetchStats();
+  }, [agentStatus, promptStatus]);
+
+  // Auto-scroll to results when first result arrives
+  const agentResultsLen = agentTest.results.length;
   const promptResultsLen = test.results.length;
 
   useEffect(() => {
@@ -174,6 +190,7 @@ export default function Home() {
             isRunning={agentTest.status === "running"}
             progress={agentTest.progress}
             totalAttacks={filteredAgentAttacks.length}
+            statsCount={statsCount}
           />
         ) : (
           <HeroTest
@@ -189,6 +206,7 @@ export default function Home() {
             disabled={!apiKey.trim() || !systemPrompt.trim()}
             isRunning={test.status === "running"}
             progress={test.progress}
+            statsCount={statsCount}
           />
         )}
 
@@ -226,6 +244,7 @@ export default function Home() {
         )}
 
         <AttackCategories
+          key={activeTab}
           categories={activeTab === "agent" ? agentCategories : undefined}
         />
         <FAQ />

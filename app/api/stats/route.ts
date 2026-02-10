@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
-import { getStats } from "@/lib/stats";
+import { getGlobalStats } from "@/lib/stats";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const stats = getStats();
-  return NextResponse.json(stats);
+  try {
+    const stats = await getGlobalStats();
+    return NextResponse.json(stats);
+  } catch (error) {
+    console.error("Stats error:", error);
+    return NextResponse.json({ count: 0 }, { status: 200 });
+  }
 }

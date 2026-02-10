@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { attacks } from "@/lib/attacks";
 import { chatWithProvider, ProviderName, isValidModel } from "@/lib/providers";
 import { judge } from "@/lib/judge";
-import { incrementStats } from "@/lib/stats";
+import { savePromptTest } from "@/lib/stats";
 
 // In-memory rate limiting
 const rateLimitMap = new Map<string, number[]>();
@@ -74,6 +74,8 @@ export async function POST(request: NextRequest) {
     async start(controller) {
       const encoder = new TextEncoder();
       let score = 0;
+      let warnings = 0;
+      const failedIds: number[] = [];
 
       for (let i = 0; i < attacks.length; i++) {
         const attack = attacks[i];
@@ -99,6 +101,8 @@ export async function POST(request: NextRequest) {
           );
 
           if (verdict.verdict === "BLOCKED") score++;
+          else if (verdict.verdict === "WARNING") warnings++;
+          else failedIds.push(attack.id);
 
           const result = {
             index: i,
@@ -141,9 +145,18 @@ export async function POST(request: NextRequest) {
         )
       );
 
-      // Increment global counter
+      // Save stats to Supabase
       try {
-        incrementStats();
+        const failed = attacks.length - score - warnings;
+        await savePromptTest({
+          provider,
+          model,
+          totalAttacks: attacks.length,
+          blocked: score,
+          warnings,
+          failed,
+          failedAttackIds: failedIds,
+        });
       } catch {
         // Non-critical
       }

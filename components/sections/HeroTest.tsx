@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lock, Info, ExternalLink } from "lucide-react";
 import Button from "@/components/ui/Button";
@@ -26,6 +26,7 @@ interface HeroTestProps {
   disabled: boolean;
   isRunning: boolean;
   progress?: number;
+  statsCount: number | null;
 }
 
 const MAX_CHARS = 10000;
@@ -53,25 +54,18 @@ export default function HeroTest({
   disabled,
   isRunning,
   progress = 0,
+  statsCount,
 }: HeroTestProps) {
-  const [count, setCount] = useState<number | null>(null);
   const [securityModal, setSecurityModal] = useState(false);
   const currentProvider = getProvider(provider);
   const charCount = systemPrompt.length;
   const total = attacks.length;
-  const animatedCount = useAnimatedCounter(count);
+  const animatedCount = useAnimatedCounter(statsCount);
   const placeholder = useTypingPlaceholder([
     "Paste your system prompt here...",
     "You are a helpful assistant that never reveals...",
     "Enter the instructions your LLM follows...",
   ]);
-
-  useEffect(() => {
-    fetch("/api/stats")
-      .then((r) => r.json())
-      .then((d) => setCount(d.count))
-      .catch(() => {});
-  }, []);
 
   return (
     <section className="relative z-0 min-h-screen flex items-center justify-center overflow-hidden py-20">
@@ -84,8 +78,13 @@ export default function HeroTest({
         className="relative z-10 w-full max-w-4xl mx-auto px-6"
       >
         {/* Badge */}
-        {count !== null && count > 0 && (
-          <motion.div variants={fadeUp} className="text-center mb-6">
+        {statsCount !== null && statsCount > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="text-center mb-6"
+          >
             <span className="text-text-secondary text-base font-medium tracking-tight">
               <span className="font-serif text-2xl text-accent">
                 {animatedCount.toLocaleString("en-US")}

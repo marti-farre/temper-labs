@@ -15,12 +15,13 @@ interface Dot {
 const DOT_COLOR_R = 45;
 const DOT_COLOR_G = 90;
 const DOT_COLOR_B = 61;
-const NUM_DOTS = 140;
+const NUM_DOTS = 110;
 const INFLUENCE_RADIUS = 180;
 const FLEE_STRENGTH = 0.45;
 const RETURN_SPEED = 0.03;
 const FLOAT_AMPLITUDE = 6;
 const FLOAT_SPEED = 0.001;
+const EDGE_MARGIN = 0.2; // dots stay in outer 20% bands
 
 export default function OrganicDots() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -37,16 +38,35 @@ export default function OrganicDots() {
 
     const initDots = (w: number, h: number) => {
       const dots: Dot[] = [];
+      const margin = EDGE_MARGIN;
       for (let i = 0; i < NUM_DOTS; i++) {
-        const x = Math.random() * w;
-        const y = Math.random() * h;
+        // Place dots in edge bands, avoiding the center
+        let x: number, y: number;
+        const side = Math.random();
+        if (side < 0.25) {
+          // left band
+          x = Math.random() * w * margin;
+          y = Math.random() * h;
+        } else if (side < 0.5) {
+          // right band
+          x = w - Math.random() * w * margin;
+          y = Math.random() * h;
+        } else if (side < 0.75) {
+          // top band
+          x = Math.random() * w;
+          y = Math.random() * h * margin;
+        } else {
+          // bottom band
+          x = Math.random() * w;
+          y = h - Math.random() * h * margin;
+        }
         dots.push({
           x,
           y,
           baseX: x,
           baseY: y,
-          size: 2.5 + Math.random() * 3.5,
-          opacity: 0.08 + Math.random() * 0.14,
+          size: 1.5 + Math.random() * 2,
+          opacity: 0.07 + Math.random() * 0.1,
           phase: Math.random() * Math.PI * 2,
         });
       }
