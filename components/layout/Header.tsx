@@ -13,7 +13,11 @@ export default function Header() {
     >
       {/* Logo */}
       <a href="#" className="flex items-center">
-        <span className="font-serif text-3xl font-bold text-accent">Temper</span>
+        <span className="font-serif text-2xl">
+          <span className="text-text-primary">Temper</span>
+          {" "}
+          <span className="text-accent">Labs</span>
+        </span>
       </a>
 
       {/* Navigation */}

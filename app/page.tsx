@@ -226,7 +226,7 @@ export default function Home() {
             categories={agentCategories}
             attacksData={agentAttacks}
             externalRecommendations={agentRecommendations}
-            reportTitle="Temper Agent Security Report"
+            reportTitle="Temper Labs Agent Security Report"
             recommendationsTitle="Strengthen your agent"
           />
         ) : (

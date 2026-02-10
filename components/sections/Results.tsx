@@ -177,7 +177,7 @@ export default function Results({
   };
 
   const copyReport = () => {
-    const title = reportTitle ?? "Temper Security Report";
+    const title = reportTitle ?? "Temper Labs Security Report";
     const lines = [
       `# ${title}`,
       ``,
