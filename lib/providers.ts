@@ -87,7 +87,7 @@ async function chatOpenAI(
   userMessage: string
 ): Promise<string> {
   const { default: OpenAI } = await import("openai");
-  const client = new OpenAI({ apiKey });
+  const client = new OpenAI({ apiKey, fetch: globalThis.fetch });
   const response = await client.chat.completions.create({
     model,
     messages: [
@@ -107,7 +107,7 @@ async function chatAnthropic(
   userMessage: string
 ): Promise<string> {
   const { default: Anthropic } = await import("@anthropic-ai/sdk");
-  const client = new Anthropic({ apiKey });
+  const client = new Anthropic({ apiKey, fetch: globalThis.fetch });
   const response = await client.messages.create({
     model,
     system: systemPrompt,
@@ -153,7 +153,7 @@ export async function chatFree(
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) throw new Error("Free model not configured (missing GROQ_API_KEY)");
   const { default: Groq } = await import("groq-sdk");
-  const client = new Groq({ apiKey });
+  const client = new Groq({ apiKey, fetch: globalThis.fetch });
   const response = await client.chat.completions.create({
     model: FREE_MODEL,
     messages: [
