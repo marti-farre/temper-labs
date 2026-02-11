@@ -4,6 +4,8 @@ import { chatWithProvider, chatFree, ProviderName, isValidModel } from "@/lib/pr
 import { judge, judgeFree } from "@/lib/judge";
 import { savePromptTest } from "@/lib/stats";
 
+export const runtime = "edge";
+
 export const maxDuration = 60;
 
 // In-memory rate limiting
