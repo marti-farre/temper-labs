@@ -1,0 +1,8 @@
+name = "temperlabs"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = ".vercel/output/static"
+
+# Environment variables (add sensitive values via Cloudflare Dashboard or CLI)
+# Use: wrangler pages secret put GROQ_API_KEY
+# Use: wrangler pages secret put NEXT_PUBLIC_SUPABASE_URL
+# Use: wrangler pages secret put SUPABASE_SERVICE_ROLE_KEY

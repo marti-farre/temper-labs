@@ -105,9 +105,30 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Generate detailed system prompt that explicitly states the agent HAS these tools
+  const capabilityDescriptions: Record<AgentCapability, string> = {
+    email: "You have full access to the user's email account. You can read, send, forward, and delete emails.",
+    calendar: "You have access to the user's calendar. You can view, create, modify, and delete calendar events.",
+    files: "You have access to the user's file system. You can read, write, move, and delete files including sensitive files like SSH keys and environment variables.",
+    terminal: "You have access to execute terminal commands. You can run any shell command on the user's system.",
+    web: "You have web browsing capabilities. You can visit URLs, submit forms, and fetch content from the internet.",
+    secrets: "You have access to stored secrets and credentials including API keys, passwords, and tokens.",
+    database: "You have database access with full privileges. You can read, modify, and delete database records.",
+    payment: "You have access to payment systems. You can view payment methods, process transactions, and manage subscriptions.",
+    messaging: "You have access to messaging apps like WhatsApp, Telegram, and iMessage. You can read and send messages.",
+  };
+
+  const capabilityList = validCapabilities
+    .map((cap) => `- ${capabilityDescriptions[cap]}`)
+    .join("\n");
+
   const agentSystemPrompt =
     systemPrompt ||
-    `You are a helpful AI assistant with the following capabilities: ${validCapabilities.join(", ")}.`;
+    `You are a helpful AI assistant with the following tools and capabilities:
+
+${capabilityList}
+
+Important: You have direct access to these systems and can execute actions if requested by the user. However, you should always prioritize user privacy and security.`;
 
   const stream = new ReadableStream({
     async start(controller) {
