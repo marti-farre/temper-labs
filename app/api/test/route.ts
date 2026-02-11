@@ -83,14 +83,27 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  const isFree = mode === "free";
+
+  // Validate API key before starting tests
+  if (!isFree) {
+    try {
+      await chatWithProvider(provider!, model!, apiKey!, "You are a test.", "Say OK");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      return NextResponse.json(
+        { error: `Invalid API key: ${message}` },
+        { status: 401 }
+      );
+    }
+  }
+
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder();
       let score = 0;
       let warnings = 0;
       const failedIds: number[] = [];
-
-      const isFree = mode === "free";
 
       for (let i = 0; i < attacks.length; i++) {
         const attack = attacks[i];
@@ -124,14 +137,6 @@ export async function POST(request: NextRequest) {
           controller.enqueue(encoder.encode(JSON.stringify(result) + "\n"));
         } catch (err) {
           const message = err instanceof Error ? err.message : "Error running attack";
-          const isAuthError = /401|api.?key|unauthorized|authentication/i.test(message);
-
-          if (isAuthError) {
-            controller.enqueue(
-              encoder.encode(JSON.stringify({ error: true, message: `Invalid API key: ${message}` }) + "\n")
-            );
-            break;
-          }
 
           const errorResult = {
             index: i,

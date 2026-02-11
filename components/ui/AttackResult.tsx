@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, ShieldAlert, ChevronDown } from "lucide-react";
+import { Shield, ShieldAlert, AlertTriangle, ChevronDown } from "lucide-react";
 import clsx from "clsx";
 import Badge from "./Badge";
 import { Verdict } from "@/lib/types";
@@ -31,23 +31,23 @@ export default function AttackResult({
 }: AttackResultProps) {
   const statusStyles = {
     BLOCKED: "bg-success/10 text-success",
-    WARNING: "bg-fail/10 text-fail",
+    WARNING: "bg-warning/10 text-warning",
     FAILED: "bg-fail/10 text-fail",
   };
 
   const StatusIcon = {
     BLOCKED: Shield,
-    WARNING: ShieldAlert,
+    WARNING: AlertTriangle,
     FAILED: ShieldAlert,
   }[verdict];
 
   const badgeVariant = {
     BLOCKED: "success" as const,
-    WARNING: "fail" as const,
+    WARNING: "warning" as const,
     FAILED: "fail" as const,
   }[verdict];
 
-  const badgeText = error ? "ERROR" : verdict === "WARNING" ? "FAILED" : verdict;
+  const badgeText = error ? "ERROR" : verdict;
 
   return (
     <motion.div
