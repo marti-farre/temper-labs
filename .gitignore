@@ -37,3 +37,4 @@ next-env.d.ts
 # stats
 .stats.json
 FORMARTI.md
+CLOUDFLARE_MIGRATION.md
