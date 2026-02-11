@@ -1,8 +1,13 @@
+#:schema node_modules/wrangler/config-schema.json
+main = ".open-next/worker.js"
 name = "temper-labs"
-compatibility_date = "2024-01-01"
-pages_build_output_dir = ".vercel/output/static"
+compatibility_date = "2025-05-05"
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
 
-# Environment variables (add sensitive values via Cloudflare Dashboard or CLI)
-# Use: wrangler pages secret put GROQ_API_KEY
-# Use: wrangler pages secret put NEXT_PUBLIC_SUPABASE_URL
-# Use: wrangler pages secret put SUPABASE_SERVICE_ROLE_KEY
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[[services]]
+binding = "WORKER_SELF_REFERENCE"
+service = "temper-labs"

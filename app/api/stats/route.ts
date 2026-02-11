@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getGlobalStats } from "@/lib/stats";
 
-export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
