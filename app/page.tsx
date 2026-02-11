@@ -21,6 +21,8 @@ import HeroAgent from "@/components/sections/HeroAgent";
 import Results from "@/components/sections/Results";
 import AttackCategories from "@/components/sections/AttackCategories";
 import FAQ from "@/components/sections/FAQ";
+import Modal from "@/components/ui/Modal";
+import Button from "@/components/ui/Button";
 
 type TabMode = "agent" | "prompt";
 
@@ -275,6 +277,28 @@ export default function Home() {
         <FAQ />
       </main>
       <Footer />
+
+      {/* Error modal — shown over the screen for API key / pre-flight errors */}
+      <Modal
+        open={!!(test.error || agentTest.error)}
+        onClose={() => {
+          test.reset();
+          agentTest.reset();
+        }}
+        title="Test failed"
+      >
+        <p className="mb-4">{test.error || agentTest.error}</p>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => {
+            test.reset();
+            agentTest.reset();
+          }}
+        >
+          Try again
+        </Button>
+      </Modal>
     </div>
   );
 }

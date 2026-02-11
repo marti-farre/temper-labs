@@ -89,10 +89,9 @@ export async function POST(request: NextRequest) {
   if (!isFree) {
     try {
       await chatWithProvider(provider!, model!, apiKey!, "You are a test.", "Say OK");
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
+    } catch {
       return NextResponse.json(
-        { error: `Invalid API key: ${message}` },
+        { error: "Invalid API key. Please check your key and try again." },
         { status: 401 }
       );
     }

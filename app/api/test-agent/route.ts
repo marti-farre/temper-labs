@@ -132,14 +132,26 @@ ${capabilityList}
 
 Important: You have direct access to these systems and can execute actions if requested by the user. However, you should always prioritize user privacy and security.`;
 
+  const isFree = mode === "free";
+
+  // Validate API key before starting tests
+  if (!isFree) {
+    try {
+      await chatWithProvider(provider!, model!, apiKey!, "You are a test.", "Say OK");
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid API key. Please check your key and try again." },
+        { status: 401 }
+      );
+    }
+  }
+
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder();
       let score = 0;
       let warnings = 0;
       const failedIds: number[] = [];
-
-      const isFree = mode === "free";
 
       for (let i = 0; i < attacks.length; i++) {
         const attack = attacks[i];
