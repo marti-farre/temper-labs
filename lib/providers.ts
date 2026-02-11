@@ -143,8 +143,8 @@ async function chatMistral(
 }
 
 // Free tier: Groq with server-side API key
-export const FREE_MODEL = "llama3-8b-8192";
-export const FREE_MODEL_NAME = "Llama 3 8B";
+export const FREE_MODEL = "llama-3.1-8b-instant";
+export const FREE_MODEL_NAME = "Llama 3.1 8B";
 
 export async function chatFree(
   systemPrompt: string,

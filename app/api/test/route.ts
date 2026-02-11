@@ -4,6 +4,8 @@ import { chatWithProvider, chatFree, ProviderName, isValidModel } from "@/lib/pr
 import { judge, judgeFree } from "@/lib/judge";
 import { savePromptTest } from "@/lib/stats";
 
+export const maxDuration = 60;
+
 // In-memory rate limiting
 const rateLimitMap = new Map<string, number[]>();
 const RATE_LIMIT = 10;
@@ -153,7 +155,7 @@ export async function POST(request: NextRequest) {
         const failed = attacks.length - score - warnings;
         await savePromptTest({
           provider: isFree ? "groq" : provider!,
-          model: isFree ? "llama3-8b-8192" : model!,
+          model: isFree ? "llama-3.1-8b-instant" : model!,
           totalAttacks: attacks.length,
           blocked: score,
           warnings,

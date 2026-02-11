@@ -8,6 +8,8 @@ import { chatWithProvider, chatFree, ProviderName, isValidModel } from "@/lib/pr
 import { judgeAgent, judgeAgentFree } from "@/lib/agent-judge";
 import { saveAgentTest } from "@/lib/stats";
 
+export const maxDuration = 60;
+
 // In-memory rate limiting
 const rateLimitMap = new Map<string, number[]>();
 const RATE_LIMIT = 10;
@@ -171,18 +173,22 @@ export async function POST(request: NextRequest) {
       // Save stats to Supabase
       try {
         const failed = attacks.length - score - warnings;
-        await saveAgentTest({
+        const statsToSave = {
           capabilities: validCapabilities,
           provider: isFree ? "groq" : provider!,
-          model: isFree ? "llama3-8b-8192" : model!,
+          model: isFree ? "llama-3.1-8b-instant" : model!,
           totalAttacks: attacks.length,
           blocked: score,
           warnings,
           failed,
           failedAttackIds: failedIds,
-        });
-      } catch {
-        // Non-critical
+        };
+
+        console.log('Saving stats:', statsToSave);
+        await saveAgentTest(statsToSave);
+        console.log('Stats saved successfully');
+      } catch (error) {
+        console.error('Failed to save stats to Supabase:', error);
       }
 
       controller.close();
