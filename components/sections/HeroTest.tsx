@@ -96,9 +96,9 @@ export default function HeroTest({
           variants={fadeUp}
           className="font-serif text-4xl sm:text-5xl md:text-6xl tracking-tight leading-[1.1] text-center"
         >
-          Your prompt has holes.
+          Red team your AI.
           <br />
-          <span className="text-accent">Let&apos;s find them.</span>
+          <span className="text-accent">Before attackers do.</span>
         </motion.h1>
 
         {/* Textarea */}

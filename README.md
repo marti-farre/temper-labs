@@ -1,6 +1,6 @@
 # TemperLLM
 
-**Red team your AI agents and prompts before hackers do.**
+**Red team your AI agents and prompts before attackers do.**
 
 TemperLLM is an open-source security testing tool for LLM systems. It runs adversarial attacks against your system prompts and AI agents, giving you a detailed security report with scores, verdicts, and recommendations.
 

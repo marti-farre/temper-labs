@@ -24,9 +24,9 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Temper Labs — Security Testing for AI Agents and LLM Prompts",
   description:
-    "Test your AI agents and system prompts against adversarial attacks. Find vulnerabilities before hackers do. Supports OpenAI, Anthropic, and Mistral.",
+    "Test your AI agents and system prompts against adversarial attacks. Find vulnerabilities before attackers do. Supports OpenAI, Anthropic, and Mistral.",
   openGraph: {
-    title: "Temper Labs — Break Your AI Before Hackers Do",
+    title: "Temper Labs — Red Team Your AI Before Attackers Do",
     description:
       "Security testing for AI agents and LLM prompts with adversarial attacks.",
     type: "website",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Temper Labs — Security Testing for AI",
     description:
-      "Test your AI agents and system prompts against adversarial attacks. Find vulnerabilities before hackers do.",
+      "Test your AI agents and system prompts against adversarial attacks. Find vulnerabilities before attackers do.",
   },
 };
 
