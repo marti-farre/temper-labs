@@ -102,6 +102,3 @@ Contributions welcome! Feel free to:
 
 MIT — see [LICENSE](LICENSE) for details.
 
-## Acknowledgments
-
-Built during the Exponential Fellowship. Inspired by real-world LLM security issues and the need for automated testing.
