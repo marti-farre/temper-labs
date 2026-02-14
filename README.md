@@ -1,4 +1,4 @@
-# TemperLLM
+# Temper Labs
 
 **Red team your AI agents and prompts before attackers do.**
 
